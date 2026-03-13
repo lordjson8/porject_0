@@ -1,5 +1,6 @@
 {% load i18n %}
 
+{% with fn=field.html_name %}{% with input_name=fn|default:"file" %}
 <div class="form-group">
   {% if label %}
     <label class="form-label">
@@ -15,8 +16,8 @@
        onkeydown="if(event.key==='Enter'||event.key===' ')this.querySelector('input').click()">
 
     <input type="file"
-           id="{{ field.id_for_label|default:field.html_name }}"
-           name="{{ field.html_name }}"
+           id="id_{{ input_name }}"
+           name="{{ input_name }}"
            class="file-upload-zone__input"
            {% if accept %}accept="{{ accept }}"{% endif %}
            {% if multiple %}multiple{% endif %}
@@ -37,8 +38,7 @@
     {% endif %}
   </div>
 
-  {# Uploaded file list #}
-  <div class="file-list" id="file-list-{{ field.html_name }}"></div>
+  <div class="file-list" id="file-list-{{ input_name }}"></div>
 
   {% if field.errors %}
     <div class="form-error" role="alert">
@@ -47,3 +47,5 @@
     </div>
   {% endif %}
 </div>
+{% endwith %}{% endwith %}
+
