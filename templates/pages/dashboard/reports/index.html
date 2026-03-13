@@ -1,0 +1,175 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Rapports & Analyses" %}{% endblock %}
+{% block page_title %}{% trans "Rapports" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Rapports & Analyses" %}</h1>
+    <p class="page-header__subtitle">{% trans "Tableaux de bord analytiques de votre flotte." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--secondary">
+      <i class="fa-solid fa-download" aria-hidden="true"></i>
+      {% trans "Exporter PDF" %}
+    </button>
+    <button class="btn btn--secondary">
+      <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+      {% trans "Exporter Excel" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_header_suffix %}
+{# Period selector #}
+<div style="display:flex;gap:var(--space-2);padding:0 var(--space-6) var(--space-4);">
+  <button class="btn btn--primary btn--sm" data-period="month">{% trans "Ce mois" %}</button>
+  <button class="btn btn--secondary btn--sm" data-period="quarter">{% trans "Trimestre" %}</button>
+  <button class="btn btn--secondary btn--sm" data-period="year">{% trans "Année" %}</button>
+  <button class="btn btn--secondary btn--sm" data-period="custom">{% trans "Personnalisé" %}</button>
+</div>
+{% endblock %}
+
+{% block css_extra %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+{% endblock %}
+
+{% block content %}
+
+{# ── KPI Row ── #}
+<div class="grid grid-cols-4 gap-4 mb-6">
+  {% load fleet_ui %}
+  {% stat_card title=_("Coût total flotte") value="248 500" trend="+12%" trend_type="down" trend_label=_("vs mois dernier") icon="fa-euro-sign" color="red" %}
+  {% stat_card title=_("Services réalisés") value="34" trend="+8" trend_type="up" trend_label=_("ce mois") icon="fa-wrench" color="orange" %}
+  {% stat_card title=_("Km parcourus") value="42 800" trend="+5%" trend_type="up" trend_label=_("ce mois") icon="fa-road" color="blue" %}
+  {% stat_card title=_("Taux disponibilité") value="92%" trend="+2%" trend_type="up" trend_label=_("vs mois dernier") icon="fa-gauge" color="green" %}
+</div>
+
+{# ── Charts Row ── #}
+<div class="grid gap-6 mb-6" style="grid-template-columns:1fr 1fr;">
+  {% include "components/charts/chart_bar.html" with chart_id="costs-monthly" title=_("Coûts mensuels (DZD)") subtitle=_("12 derniers mois") height=260 chart_data='{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[18500,22000,19800,24500,21000,28000,25500,23000,27000,31000,26000,29500]}' %}
+  {% include "components/charts/chart_line.html" with chart_id="km-monthly" title=_("Kilométrage mensuel") subtitle=_("Total flotte") height=260 chart_data='{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[3200,3800,3500,4100,3900,4600,4200,3700,4400,5100,4300,4800]}' %}
+</div>
+
+<div class="grid gap-6 mb-6" style="grid-template-columns:2fr 1fr;">
+  {# Services Table #}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <h2 class="card__title">{% trans "Services par type" %}</h2>
+        <p class="card__subtitle">{% trans "Répartition des interventions" %}</p>
+      </div>
+    </div>
+    <div class="card__body" style="padding:0;">
+      <table class="data-table" aria-label="{% trans 'Services par type' %}">
+        <thead>
+          <tr>
+            <th>{% trans "Type de service" %}</th>
+            <th>{% trans "Nombre" %}</th>
+            <th>{% trans "Coût total" %}</th>
+            <th>{% trans "Part" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in service_stats %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td>{{ row.count }}</td>
+              <td>{{ row.cost }} DZD</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:var(--space-2);">
+                  <div style="flex:1;height:6px;background:var(--color-bg-muted);border-radius:var(--radius-full);overflow:hidden;">
+                    <div style="height:100%;width:{{ row.percent }}%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
+                  </div>
+                  <span style="font-size:var(--text-xs);color:var(--color-text-muted);width:32px;">{{ row.percent }}%</span>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            {% for row in default_service_stats %}
+              <tr>
+                <td data-label="{% trans 'Type' %}">{{ row.0 }}</td>
+                <td data-label="{% trans 'Nombre' %}">{{ row.1 }}</td>
+                <td data-label="{% trans 'Coût' %}">{{ row.2 }}</td>
+                <td data-label="{% trans 'Part' %}">
+                  <div style="display:flex;align-items:center;gap:var(--space-2);">
+                    <div style="flex:1;height:6px;background:var(--color-bg-muted);border-radius:var(--radius-full);overflow:hidden;">
+                      <div style="height:100%;width:{{ row.3 }}%;background:var(--color-primary);border-radius:var(--radius-full);"></div>
+                    </div>
+                    <span style="font-size:var(--text-xs);color:var(--color-text-muted);width:32px;">{{ row.3 }}%</span>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# Donut chart #}
+  {% include "components/charts/chart_donut.html" with chart_id="category-report" title=_("Par catégorie") subtitle=_("Répartition du parc") height=240 chart_data='{"labels":["Berlines","SUV","Utilitaires","Camions","Motos"],"values":[45,30,15,7,3]}' show_legend=True %}
+</div>
+
+{# ── Top Vehicles ── #}
+<div class="card">
+  <div class="card__header">
+    <div>
+      <h2 class="card__title">{% trans "Top véhicules — Kilométrage" %}</h2>
+      <p class="card__subtitle">{% trans "Véhicules les plus utilisés ce mois" %}</p>
+    </div>
+  </div>
+  <div class="card__body" style="padding:0;">
+    <table class="data-table" aria-label="{% trans 'Top véhicules' %}">
+      <thead>
+        <tr>
+          <th>{% trans "Rang" %}</th>
+          <th>{% trans "Immatriculation" %}</th>
+          <th>{% trans "Modèle" %}</th>
+          <th>{% trans "Conducteur" %}</th>
+          <th>{% trans "Km ce mois" %}</th>
+          <th>{% trans "Km total" %}</th>
+          <th>{% trans "Statut" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in top_vehicles %}
+          <tr>
+            <td><span class="badge badge--neutral">#{{ forloop.counter }}</span></td>
+            <td><code class="cell-plate">{{ v.plate }}</code></td>
+            <td>{{ v.model_name }}</td>
+            <td>{{ v.driver_name|default:"—" }}</td>
+            <td>{{ v.km_month|floatformat:0 }} km</td>
+            <td>{{ v.km_total|floatformat:0 }} km</td>
+            <td>{% include "components/fleet/status_badge.html" with status=v.status %}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="padding:0;border:none;">
+              {% include "components/ui/empty_state.html" with icon="fa-chart-bar" title=_("Aucune donnée") subtitle=_("Les rapports apparaîtront une fois des données disponibles.") %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_extra %}
+<script>
+var defaultServiceStats = [
+  ['{% trans "Vidange" %}', 12, '48 000 DZD', 35],
+  ['{% trans "Révision" %}', 8, '64 000 DZD', 23],
+  ['{% trans "Pneus" %}', 6, '42 000 DZD', 18],
+  ['{% trans "Freins" %}', 5, '35 000 DZD', 15],
+  ['{% trans "Autre" %}', 3, '18 500 DZD', 9],
+];
+</script>
+{% endblock %}

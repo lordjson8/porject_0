@@ -136,11 +136,11 @@
           </div>
         </div>
 
-        <a class="user-menu__item" href="#" role="menuitem">
+        <a class="user-menu__item" href="{% url 'dashboard:profile' %}" role="menuitem">
           <i class="fa-solid fa-user" aria-hidden="true"></i>
           {% trans "Mon profil" %}
         </a>
-        <a class="user-menu__item" href="#" role="menuitem">
+        <a class="user-menu__item" href="{% url 'auth:password-change' %}" role="menuitem">
           <i class="fa-solid fa-lock" aria-hidden="true"></i>
           {% trans "Changer le mot de passe" %}
         </a>

@@ -9,6 +9,11 @@ from django.conf.urls.i18n import i18n_patterns
 from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django import forms as dj_forms
 
 
 # ── Minimal demo views using TemplateView for UI prototyping ──────────────────
@@ -87,6 +92,50 @@ class VehicleFormView(TemplateView):
         return ctx
 
 
+class RegisterForm(UserCreationForm):
+    first_name = dj_forms.CharField(max_length=30, required=False)
+    last_name = dj_forms.CharField(max_length=30, required=False)
+    email = dj_forms.EmailField(required=False)
+
+    class Meta(UserCreationForm.Meta):
+        fields = ('first_name', 'last_name', 'username', 'email', 'password1', 'password2')
+
+
+class RegisterView(CreateView):
+    form_class = RegisterForm
+    template_name = 'pages/auth/register.html'
+    success_url = reverse_lazy('auth:login')
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['form'] = ctx.get('form') or RegisterForm()
+        return ctx
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'pages/dashboard/profile/index.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['breadcrumb_items'] = [
+            ('Accueil', '/fr/dashboard/'),
+            ('Profil', None),
+        ]
+        return ctx
+
+    def post(self, request, *args, **kwargs):
+        from django.contrib import messages
+        from django.shortcuts import redirect
+        user = request.user
+        user.first_name = request.POST.get('first_name', '')
+        user.last_name = request.POST.get('last_name', '')
+        user.email = request.POST.get('email', '')
+        user.username = request.POST.get('username', user.username) or user.username
+        user.save()
+        messages.success(request, 'Profil mis à jour avec succès.')
+        return redirect(request.path)
+
+
 urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
@@ -125,6 +174,18 @@ urlpatterns += i18n_patterns(
              auth_views.PasswordResetConfirmView.as_view(
                  template_name='pages/auth/password_reset_confirm.html'),
              name='password_reset_confirm'),
+        path('register/',
+             RegisterView.as_view(),
+             name='register'),
+        path('password-change/',
+             auth_views.PasswordChangeView.as_view(
+                 template_name='pages/auth/password_change.html',
+                 success_url=reverse_lazy('auth:password-change-done')),
+             name='password-change'),
+        path('password-change/done/',
+             auth_views.PasswordChangeDoneView.as_view(
+                 template_name='pages/auth/password_change_done.html'),
+             name='password-change-done'),
     ], 'auth'), namespace='auth')),
 
     # Dashboard
@@ -271,6 +332,44 @@ urlpatterns += i18n_patterns(
                      ],
                  }),
              name='settings'),
+        path('reports/',
+             TemplateView.as_view(
+                 template_name='pages/dashboard/reports/index.html',
+                 extra_context={
+                     'service_stats': [],
+                     'top_vehicles': [],
+                     'default_service_stats': [
+                         ('Vidange', 12, '48 000 DZD', 35),
+                         ('Révision', 8, '64 000 DZD', 23),
+                         ('Pneus', 6, '42 000 DZD', 18),
+                         ('Freins', 5, '35 000 DZD', 15),
+                         ('Autre', 3, '18 500 DZD', 9),
+                     ],
+                     'breadcrumb_items': [
+                         ('Accueil', '/fr/dashboard/'),
+                         ('Rapports', None),
+                     ],
+                 }),
+             name='reports'),
+        path('locations/',
+             TemplateView.as_view(
+                 template_name='pages/dashboard/locations/index.html',
+                 extra_context={
+                     'locations': [],
+                     'demo_locations': [
+                         ('Dépôt Central', 'Alger', 42, 60),
+                         ('Garage Ouest', 'Oran', 18, 25),
+                         ('Agence Est', 'Constantine', 12, 20),
+                     ],
+                     'breadcrumb_items': [
+                         ('Accueil', '/fr/dashboard/'),
+                         ('Emplacements', None),
+                     ],
+                 }),
+             name='locations'),
+        path('profile/',
+             ProfileView.as_view(),
+             name='profile'),
     ], 'dashboard'), namespace='dashboard')),
 
     prefix_default_language=True,

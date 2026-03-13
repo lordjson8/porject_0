@@ -1,0 +1,172 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Mon profil" %}{% endblock %}
+{% block page_title %}{% trans "Mon profil" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Mon profil" %}</h1>
+    <p class="page-header__subtitle">{% trans "Gérez vos informations personnelles et préférences." %}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="display:grid;grid-template-columns:300px 1fr;gap:var(--space-6);align-items:flex-start;">
+
+  {# ── Avatar Card ── #}
+  <div class="card">
+    <div class="card__body" style="text-align:center;padding:var(--space-8) var(--space-6);">
+      <div style="width:96px;height:96px;border-radius:50%;background:var(--color-primary-subtle);display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-4);font-size:36px;color:var(--color-primary);font-family:var(--font-heading);font-weight:var(--font-bold);">
+        {% if request.user.get_full_name %}
+          {{ request.user.get_full_name|slice:":1"|upper }}
+        {% else %}
+          {{ request.user.username|slice:":1"|upper }}
+        {% endif %}
+      </div>
+      <h2 style="font-family:var(--font-heading);font-size:var(--text-xl);font-weight:var(--font-bold);color:var(--color-text-dark);margin-bottom:var(--space-1);">
+        {{ request.user.get_full_name|default:request.user.username }}
+      </h2>
+      <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-4);">
+        {{ request.user.email|default:"—" }}
+      </p>
+      <span class="badge {% if request.user.is_staff %}badge--warning{% else %}badge--info{% endif %}">
+        {% if request.user.is_superuser %}{% trans "Super Administrateur" %}
+        {% elif request.user.is_staff %}{% trans "Administrateur" %}
+        {% else %}{% trans "Utilisateur" %}{% endif %}
+      </span>
+
+      <div style="margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--color-border);text-align:left;">
+        <p style="font-size:var(--text-xs);font-weight:var(--font-semibold);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-muted);margin-bottom:var(--space-3);">{% trans "Informations" %}</p>
+        <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+          <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted);">
+            <i class="fa-solid fa-calendar" style="width:16px;color:var(--color-primary);" aria-hidden="true"></i>
+            <span>{% trans "Inscrit le" %} {{ request.user.date_joined|date:"d/m/Y" }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted);">
+            <i class="fa-solid fa-clock" style="width:16px;color:var(--color-primary);" aria-hidden="true"></i>
+            <span>{% trans "Dernière connexion" %}: {{ request.user.last_login|date:"d/m/Y H:i"|default:"—" }}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted);">
+            <i class="fa-solid fa-circle{% if request.user.is_active %} text-success{% else %} text-danger{% endif %}" style="width:16px;" aria-hidden="true"></i>
+            <span>{% if request.user.is_active %}{% trans "Compte actif" %}{% else %}{% trans "Compte inactif" %}{% endif %}</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="{% url 'auth:password-change' %}" class="btn btn--secondary btn--sm btn--full" style="margin-top:var(--space-4);">
+        <i class="fa-solid fa-key" aria-hidden="true"></i>
+        {% trans "Changer le mot de passe" %}
+      </a>
+    </div>
+  </div>
+
+  {# ── Edit Form ── #}
+  <div style="display:flex;flex-direction:column;gap:var(--space-6);">
+
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">{% trans "Informations personnelles" %}</h2>
+      </div>
+      <div class="card__body">
+        <form method="post" action="{% url 'dashboard:profile' %}" novalidate>
+          {% csrf_token %}
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="id_first_name">{% trans "Prénom" %}</label>
+              <input type="text" id="id_first_name" name="first_name"
+                     class="form-control"
+                     value="{{ request.user.first_name }}"
+                     placeholder="{% trans 'Jean' %}"
+                     autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="id_last_name">{% trans "Nom" %}</label>
+              <input type="text" id="id_last_name" name="last_name"
+                     class="form-control"
+                     value="{{ request.user.last_name }}"
+                     placeholder="{% trans 'Dupont' %}"
+                     autocomplete="family-name">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="id_username">{% trans "Nom d'utilisateur" %}</label>
+              <div class="input-group">
+                <i class="fa-solid fa-user input-group__icon" aria-hidden="true"></i>
+                <input type="text" id="id_username" name="username"
+                       class="form-control"
+                       value="{{ request.user.username }}"
+                       autocomplete="username">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="id_email">{% trans "Adresse e-mail" %}</label>
+              <div class="input-group">
+                <i class="fa-solid fa-envelope input-group__icon" aria-hidden="true"></i>
+                <input type="email" id="id_email" name="email"
+                       class="form-control"
+                       value="{{ request.user.email }}"
+                       placeholder="{% trans 'jean@exemple.com' %}"
+                       autocomplete="email">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:var(--space-4);">
+            <button type="submit" class="btn btn--primary">
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
+              {% trans "Enregistrer les modifications" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    {# ── Preferences ── #}
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">{% trans "Préférences" %}</h2>
+      </div>
+      <div class="card__body">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <p style="font-weight:var(--font-medium);color:var(--color-text-dark);margin-bottom:2px;">{% trans "Notifications par e-mail" %}</p>
+              <p style="font-size:var(--text-sm);color:var(--color-text-muted);">{% trans "Recevoir les alertes d'expiration par e-mail" %}</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" class="toggle__input" checked>
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+            </label>
+          </div>
+          <div style="border-top:1px solid var(--color-border);padding-top:var(--space-4);display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <p style="font-weight:var(--font-medium);color:var(--color-text-dark);margin-bottom:2px;">{% trans "Alertes documents" %}</p>
+              <p style="font-size:var(--text-sm);color:var(--color-text-muted);">{% trans "Alertes 30 jours avant expiration" %}</p>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" class="toggle__input" checked>
+              <span class="toggle__track"><span class="toggle__thumb"></span></span>
+            </label>
+          </div>
+          <div style="border-top:1px solid var(--color-border);padding-top:var(--space-4);display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <p style="font-weight:var(--font-medium);color:var(--color-text-dark);margin-bottom:2px;">{% trans "Langue de l'interface" %}</p>
+              <p style="font-size:var(--text-sm);color:var(--color-text-muted);">{% trans "Langue d'affichage préférée" %}</p>
+            </div>
+            <form action="{% url 'set_language' %}" method="post" style="display:flex;gap:var(--space-2);">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.path }}">
+              <button type="submit" name="language" value="fr" class="btn btn--secondary btn--sm {% if LANGUAGE_CODE == 'fr' %}btn--primary{% endif %}">FR</button>
+              <button type="submit" name="language" value="en" class="btn btn--secondary btn--sm {% if LANGUAGE_CODE == 'en' %}btn--primary{% endif %}">EN</button>
+              <button type="submit" name="language" value="ar" class="btn btn--secondary btn--sm {% if LANGUAGE_CODE == 'ar' %}btn--primary{% endif %}">AR</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

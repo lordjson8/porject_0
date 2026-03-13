@@ -1,0 +1,183 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Emplacements" %}{% endblock %}
+{% block page_title %}{% trans "Emplacements" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Emplacements" %}</h1>
+    <p class="page-header__subtitle">{% trans "Gérez les sites, dépôts et garages de votre flotte." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--primary" data-modal-trigger="add-location-modal">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouvel emplacement" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ── Stats ── #}
+{% load fleet_ui %}
+<div class="grid grid-cols-4 gap-4 mb-6">
+  {% stat_card title=_("Sites actifs") value=total_locations|default:0 trend="+0" trend_type="neutral" trend_label=_("emplacements") icon="fa-map-marker-alt" color="blue" %}
+  {% stat_card title=_("Véhicules assignés") value=vehicles_assigned|default:0 trend="+0" trend_type="neutral" trend_label=_("véhicules") icon="fa-car" color="orange" %}
+  {% stat_card title=_("Capacité totale") value=total_capacity|default:0 trend="+0" trend_type="neutral" trend_label=_("places") icon="fa-warehouse" color="green" %}
+  {% stat_card title=_("Taux d'occupation") value=occupancy_rate|default:"0%" trend="+0%" trend_type="neutral" trend_label=_("capacité") icon="fa-gauge" color="purple" %}
+</div>
+
+{# ── Locations Grid ── #}
+<div class="grid gap-5" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr));">
+  {% for loc in locations %}
+    <div class="card">
+      <div class="card__body">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:var(--space-4);">
+          <div style="display:flex;align-items:center;gap:var(--space-3);">
+            <div style="width:44px;height:44px;background:var(--color-primary-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-size:20px;flex-shrink:0;">
+              <i class="fa-solid fa-{{ loc.icon|default:'warehouse' }}" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h3 style="font-weight:var(--font-semibold);color:var(--color-text-dark);">{{ loc.name }}</h3>
+              <p style="font-size:var(--text-sm);color:var(--color-text-muted);">{{ loc.city }}</p>
+            </div>
+          </div>
+          <span class="badge {% if loc.is_active %}badge--success{% else %}badge--neutral{% endif %}">
+            {% if loc.is_active %}{% trans "Actif" %}{% else %}{% trans "Inactif" %}{% endif %}
+          </span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);margin-bottom:var(--space-4);">
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Véhicules" %}</p>
+            <p style="font-weight:var(--font-bold);color:var(--color-text-dark);">{{ loc.vehicle_count|default:0 }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Capacité" %}</p>
+            <p style="font-weight:var(--font-bold);color:var(--color-text-dark);">{{ loc.capacity|default:"—" }}</p>
+          </div>
+        </div>
+
+        {% if loc.capacity %}
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-1);">
+              <span>{% trans "Occupation" %}</span>
+              <span>{{ loc.vehicle_count|default:0 }} / {{ loc.capacity }}</span>
+            </div>
+            <div style="height:6px;background:var(--color-bg-muted);border-radius:var(--radius-full);overflow:hidden;">
+              <div style="height:100%;background:var(--color-primary);border-radius:var(--radius-full);width:{{ loc.occupancy_pct|default:0 }}%;"></div>
+            </div>
+          </div>
+        {% endif %}
+
+        <div style="display:flex;gap:var(--space-2);margin-top:var(--space-4);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
+          <button class="btn btn--secondary btn--sm" style="flex:1;">
+            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+            {% trans "Modifier" %}
+          </button>
+          <button class="btn btn--ghost btn--sm btn--icon" aria-label="{% trans 'Supprimer' %}">
+            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div style="grid-column:1/-1;">
+      {% include "components/ui/empty_state.html" with icon="fa-map-marker-alt" title=_("Aucun emplacement") subtitle=_("Ajoutez votre premier site ou dépôt de véhicules.") cta_label=_("Nouvel emplacement") cta_modal="add-location-modal" cta_icon="fa-plus" %}
+    </div>
+  {% endfor %}
+
+  {# Demo cards when empty #}
+  {% if not locations %}
+    {% for demo in demo_locations %}
+      <div class="card" style="opacity:0.5;">
+        <div class="card__body">
+          <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);">
+            <div style="width:44px;height:44px;background:var(--color-bg-muted);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);font-size:20px;flex-shrink:0;">
+              <i class="fa-solid fa-warehouse" aria-hidden="true"></i>
+            </div>
+            <div>
+              <h3 style="font-weight:var(--font-semibold);color:var(--color-text-dark);">{{ demo.0 }}</h3>
+              <p style="font-size:var(--text-sm);color:var(--color-text-muted);">{{ demo.1 }}</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+            <div>
+              <p class="text-xs text-muted" style="margin-bottom:2px;">{% trans "Véhicules" %}</p>
+              <p style="font-weight:var(--font-bold);">{{ demo.2 }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted" style="margin-bottom:2px;">{% trans "Capacité" %}</p>
+              <p style="font-weight:var(--font-bold);">{{ demo.3 }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{# ── Add Location Modal ── #}
+<div class="modal-backdrop" data-modal-id="add-location-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal modal--md">
+    <div class="modal__header">
+      <h2 class="modal__title">{% trans "Nouvel emplacement" %}</h2>
+      <button class="modal__close" data-modal-close="add-location-modal" aria-label="{% trans 'Fermer' %}">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="loc-name">{% trans "Nom du site" %} <span class="required">*</span></label>
+          <input type="text" id="loc-name" class="form-control" placeholder="{% trans 'Ex: Dépôt central' %}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loc-code">{% trans "Code" %}</label>
+          <input type="text" id="loc-code" class="form-control" placeholder="{% trans 'Ex: DEPOT-01' %}" style="font-family:var(--font-mono);">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loc-city">{% trans "Ville" %}</label>
+          <input type="text" id="loc-city" class="form-control" placeholder="{% trans 'Alger' %}">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loc-capacity">{% trans "Capacité (nb véhicules)" %}</label>
+          <input type="number" id="loc-capacity" class="form-control" placeholder="50" min="1">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label" for="loc-address">{% trans "Adresse" %}</label>
+          <textarea id="loc-address" class="form-control" rows="2" placeholder="{% trans 'Rue, quartier...' %}"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loc-type">{% trans "Type" %}</label>
+          <select id="loc-type" class="form-control form-select">
+            <option value="depot">{% trans "Dépôt" %}</option>
+            <option value="garage">{% trans "Garage" %}</option>
+            <option value="parking">{% trans "Parking" %}</option>
+            <option value="agency">{% trans "Agence" %}</option>
+          </select>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;padding-top:var(--space-5);">
+          <label class="toggle">
+            <input type="checkbox" class="toggle__input" checked>
+            <span class="toggle__track"><span class="toggle__thumb"></span></span>
+            <span class="toggle__label">{% trans "Site actif" %}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary" data-modal-close="add-location-modal">{% trans "Annuler" %}</button>
+      <button class="btn btn--primary">
+        <i class="fa-solid fa-check" aria-hidden="true"></i>
+        {% trans "Enregistrer" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -124,3 +124,12 @@
   });
   </script>
 {% endblock %}
+
+{% block auth_footer_link %}
+<p style="text-align:center;margin-top:var(--space-5);font-size:var(--text-sm);color:var(--color-text-muted);">
+  {% trans "Pas encore de compte ?" %}
+  <a href="{% url 'auth:register' %}" class="text-primary" style="font-weight:var(--font-medium);">
+    {% trans "Créer un compte" %}
+  </a>
+</p>
+{% endblock %}

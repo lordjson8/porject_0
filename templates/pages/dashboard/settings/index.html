@@ -23,7 +23,7 @@
       <div class="card__header">
         <h2 class="card__title">{% trans "Catégories" %}</h2>
       </div>
-      <div class="card__body" style="padding:var(--space-2) 0;">
+      <div class="card__body" style="padding:var(--space-2) 0;--sidebar-text:var(--color-text-body);--sidebar-text-active:var(--color-text-dark);--sidebar-item-hover-bg:var(--color-bg-hover);--sidebar-item-active-bg:var(--color-primary-subtle);--sidebar-border:var(--color-border);">
         {% with active_section=active_section|default:'fuel-types' %}
 
         {% for section in settings_sections %}
