@@ -95,23 +95,13 @@
               {% endif %}
             </td>
             <td>
-              {% include "components/tables/table_actions.html" with
-                  edit_url=driver.edit_url
-                  delete_url=driver.delete_url
-              %}
+              {% include "components/tables/table_actions.html" with edit_url=driver.edit_url delete_url=driver.delete_url %}
             </td>
           </tr>
         {% empty %}
           <tr>
             <td colspan="7" style="padding:0;border:none;">
-              {% include "components/ui/empty_state.html" with
-                  icon="fa-id-card"
-                  title=_("Aucun conducteur")
-                  subtitle=_("Enregistrez les conducteurs de votre parc.")
-                  cta_label=_("Nouveau conducteur")
-                  cta_modal="add-driver-modal"
-                  cta_icon="fa-plus"
-              %}
+              {% include "components/ui/empty_state.html" with icon="fa-id-card" title=_("Aucun conducteur") subtitle=_("Enregistrez les conducteurs de votre parc.") cta_label=_("Nouveau conducteur") cta_modal="add-driver-modal" cta_icon="fa-plus" %}
             </td>
           </tr>
         {% endfor %}

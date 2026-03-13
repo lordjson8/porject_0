@@ -135,14 +135,7 @@
               {% empty %}
                 <tr>
                   <td colspan="5" style="padding:0;border:none;">
-                    {% include "components/ui/empty_state.html" with
-                        icon="fa-gear"
-                        title=_("Aucun élément")
-                        subtitle=_("Ajoutez votre premier élément de configuration.")
-                        cta_label=_("Ajouter")
-                        cta_modal="add-setting-modal"
-                        cta_icon="fa-plus"
-                    %}
+                    {% include "components/ui/empty_state.html" with icon="fa-gear" title=_("Aucun élément") subtitle=_("Ajoutez votre premier élément de configuration.") cta_label=_("Ajouter") cta_modal="add-setting-modal" cta_icon="fa-plus" %}
                   </td>
                 </tr>
               {% endfor %}

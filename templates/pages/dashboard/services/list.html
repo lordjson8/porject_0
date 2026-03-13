@@ -81,11 +81,7 @@
               {% endif %}
             </td>
             <td>
-              {% include "components/tables/table_actions.html" with
-                  view_url=service.detail_url
-                  edit_url=service.edit_url
-                  delete_url=service.delete_url
-              %}
+              {% include "components/tables/table_actions.html" with view_url=service.detail_url edit_url=service.edit_url delete_url=service.delete_url %}
             </td>
           </tr>
         {% empty %}

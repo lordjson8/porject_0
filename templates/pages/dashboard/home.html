@@ -39,23 +39,10 @@
      aria-label="{% trans 'Graphiques' %}">
 
   {# Bar Chart: Services par mois #}
-  {% include "components/charts/chart_bar.html" with
-      chart_id="services-monthly"
-      title=_("Services par mois")
-      subtitle=_("12 derniers mois")
-      height=280
-      chart_data=services_chart_data|default:'{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[12,8,15,10,18,22,14,9,17,20,13,16]}'
-  %}
+  {% include "components/charts/chart_bar.html" with chart_id="services-monthly" title=_("Services par mois") subtitle=_("12 derniers mois") height=280 chart_data=services_chart_data|default:'{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[12,8,15,10,18,22,14,9,17,20,13,16]}' %}
 
   {# Donut Chart: Répartition par catégorie #}
-  {% include "components/charts/chart_donut.html" with
-      chart_id="category-breakdown"
-      title=_("Par catégorie")
-      subtitle=_("Répartition du parc")
-      height=240
-      chart_data=category_chart_data|default:'{"labels":["Berline","SUV","Utilitaire","Camion","Moto"],"values":[45,30,15,7,3]}'
-      show_legend=True
-  %}
+  {% include "components/charts/chart_donut.html" with chart_id="category-breakdown" title=_("Par catégorie") subtitle=_("Répartition du parc") height=240 chart_data=category_chart_data|default:'{"labels":["Berline","SUV","Utilitaire","Camion","Moto"],"values":[45,30,15,7,3]}' show_legend=True %}
 
 </div>
 
@@ -109,14 +96,7 @@
           </tbody>
         </table>
       {% else %}
-        {% include "components/ui/empty_state.html" with
-            icon="fa-car"
-            title=_("Aucun véhicule")
-            subtitle=_("Commencez par enregistrer votre premier véhicule.")
-            cta_label=_("Ajouter un véhicule")
-            cta_href="/dashboard/vehicles/new/"
-            cta_icon="fa-plus"
-        %}
+        {% include "components/ui/empty_state.html" with icon="fa-car" title=_("Aucun véhicule") subtitle=_("Commencez par enregistrer votre premier véhicule.") cta_label=_("Ajouter un véhicule") cta_href="/dashboard/vehicles/new/" cta_icon="fa-plus" %}
       {% endif %}
     </div>
   </div>
@@ -138,11 +118,7 @@
           {% include "components/fleet/contract_row.html" with contract=contract %}
         {% endfor %}
       {% else %}
-        {% include "components/ui/empty_state.html" with
-            icon="fa-file-contract"
-            title=_("Aucune échéance")
-            subtitle=_("Tous vos contrats sont à jour.")
-        %}
+        {% include "components/ui/empty_state.html" with icon="fa-file-contract" title=_("Aucune échéance") subtitle=_("Tous vos contrats sont à jour.") %}
       {% endif %}
     </div>
   </div>

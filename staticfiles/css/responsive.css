@@ -1,0 +1,334 @@
+/* =============================================================================
+   responsive.css — All media queries (mobile-first)
+   Breakpoints: Mobile < 640px | Tablet 640–1024px | Desktop > 1024px
+   ============================================================================= */
+
+/* ══════════════════════════════════════════════
+   TABLET (≤ 1024px)
+   ══════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  /* Sidebar becomes overlay on tablet */
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: var(--z-modal);
+  }
+
+  [dir="rtl"] .sidebar {
+    transform: translateX(100%);
+  }
+
+  .sidebar.is-mobile-open {
+    transform: translateX(0);
+  }
+
+  .main-wrapper {
+    margin-left: 0 !important;
+  }
+
+  [dir="rtl"] .main-wrapper {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* Show hamburger */
+  .topbar__hamburger {
+    display: flex;
+  }
+
+  /* Hide desktop-only sidebar state */
+  .sidebar.is-collapsed {
+    transform: translateX(-100%);
+  }
+
+  [dir="rtl"] .sidebar.is-collapsed {
+    transform: translateX(100%);
+  }
+
+  /* Stat cards: 2 columns */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Form grid: 1 column */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid--3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Chart row stacks */
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Auth card: hide brand panel */
+  .auth-brand {
+    display: none;
+  }
+
+  .auth-card {
+    max-width: 480px;
+  }
+
+  /* Hide language name, show only flag */
+  .lang-switcher__name {
+    display: none;
+  }
+
+  /* User menu: hide name on tablet */
+  .user-menu__name,
+  .user-menu__role {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   MOBILE (≤ 640px)
+   ══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  /* Content padding reduced */
+  .main-content {
+    padding: var(--space-4);
+  }
+
+  /* Page header stacks */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .page-header__title {
+    font-size: var(--text-2xl);
+  }
+
+  .page-header__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Stat cards: 1 column */
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Vehicle cards: 1 column */
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Filter bar stacks */
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar__search {
+    min-width: 0;
+  }
+
+  .filter-bar__select {
+    min-width: 0;
+  }
+
+  .filter-bar__actions {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  /* Topbar adjustments */
+  .topbar {
+    padding: 0 var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .topbar__page-title {
+    font-size: var(--text-base);
+  }
+
+  /* Table: card stack mode */
+  .data-table thead { display: none; }
+
+  .data-table tbody tr {
+    display: block;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .data-table td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-2);
+  }
+
+  .data-table td:last-child { border-bottom: none; }
+
+  .data-table td::before {
+    content: attr(data-label);
+    font-size: var(--text-xs);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: 90px;
+  }
+
+  .data-table td.col-check { display: none; }
+
+  /* Pagination info hidden */
+  .pagination__info { display: none; }
+
+  /* Stepper: compact */
+  .step__label { display: none; }
+
+  /* Modal: full screen */
+  .modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    max-height: 90vh;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Auth card full screen */
+  .auth-card {
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+    max-width: 100%;
+  }
+
+  .auth-form-panel {
+    padding: var(--space-6) var(--space-5);
+  }
+
+  /* Form grid: 1 column */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid--3 {
+    grid-template-columns: 1fr;
+  }
+
+  /* Topbar: icon only */
+  .lang-switcher__flag + .lang-switcher__name { display: none; }
+
+  /* Landing hero */
+  .hero { padding: var(--space-12) var(--space-5); }
+  .hero__title { font-size: var(--text-4xl); }
+  .features-grid { grid-template-columns: 1fr; }
+  .stats-bar { flex-direction: column; }
+
+  /* Table toolbar */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .table-toolbar__right {
+    justify-content: flex-end;
+  }
+
+  /* Bulk actions */
+  .bulk-actions-bar {
+    flex-wrap: wrap;
+  }
+
+  /* Footer */
+  .footer {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   RTL SUPPORT (direction="rtl")
+   ══════════════════════════════════════════════ */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .page-header__actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .breadcrumb {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+
+[dir="rtl"] .filter-bar__actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+[dir="rtl"] .table-actions {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .data-table th,
+[dir="rtl"] .data-table td {
+  text-align: right;
+}
+
+[dir="rtl"] .stepper {
+  flex-direction: row-reverse;
+}
+
+/* ══════════════════════════════════════════════
+   PRINT STYLES
+   ══════════════════════════════════════════════ */
+@media print {
+  .sidebar,
+  .topbar,
+  .footer,
+  .table-toolbar,
+  .filter-bar,
+  .table-actions,
+  .pagination,
+  .btn,
+  .no-print {
+    display: none !important;
+  }
+
+  .main-wrapper {
+    margin: 0 !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+  }
+
+  .card, .table-wrapper {
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+
+  .data-table {
+    font-size: 11px;
+  }
+
+  body {
+    font-size: 12px;
+    color: #000;
+  }
+}

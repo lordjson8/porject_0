@@ -23,13 +23,9 @@
 {% block content %}
 
 {# ── Stepper ── #}
-{% with steps=form_steps|default:default_steps current_step=current_step|default:1 %}
-  {% include "components/navigation/stepper.html" with
-      steps=steps
-      current_step=current_step
-      stepper_id="vehicle-stepper"
-  %}
-{% endwith %}
+{% if form_steps %}
+  {% include "components/navigation/stepper.html" with steps=form_steps current_step=current_step|default:1 stepper_id="vehicle-stepper" %}
+{% endif %}
 
 <div class="card">
   <div class="card__body">
@@ -211,16 +207,8 @@
       {# ── Step 3: Documents ── #}
       <div data-step-panel="3" style="display:none;">
         <h2 class="section__title">{% trans "Documents administratifs" %}</h2>
-        {% include "components/forms/file_upload.html" with
-            label=_("Carte grise")
-            accept=".pdf,.jpg,.jpeg,.png"
-            help_text=_("PDF ou image — Max 5 Mo")
-        %}
-        {% include "components/forms/file_upload.html" with
-            label=_("Attestation d'assurance")
-            accept=".pdf,.jpg,.jpeg,.png"
-            help_text=_("PDF ou image — Max 5 Mo")
-        %}
+        {% include "components/forms/file_upload.html" with label=_("Carte grise") accept=".pdf,.jpg,.jpeg,.png" help_text=_("PDF ou image — Max 5 Mo") %}
+        {% include "components/forms/file_upload.html" with label=_("Attestation d'assurance") accept=".pdf,.jpg,.jpeg,.png" help_text=_("PDF ou image — Max 5 Mo") %}
       </div>
 
       {# ── Step 4: Récapitulatif ── #}

@@ -17,9 +17,7 @@
     </p>
   </div>
   <div class="page-header__actions">
-    {% include "components/navigation/breadcrumb.html" with
-        items=breadcrumb_items|default:vehicle_breadcrumbs
-    %}
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
     {# View Toggle: grid / list #}
     <div class="d-flex gap-1">
       <button class="btn btn--secondary btn--sm btn--icon"
@@ -53,12 +51,7 @@
 {# ── Filter Bar ── #}
 <form method="get" class="filter-bar" role="search" aria-label="{% trans 'Filtres véhicules' %}">
   <div class="filter-bar__search">
-    {% include "components/forms/search_bar.html" with
-        name="q"
-        value=request.GET.q
-        placeholder=_("Rechercher par immatriculation, modèle...")
-        target_table="vehicles-table"
-    %}
+    {% include "components/forms/search_bar.html" with name="q" value=request.GET.q placeholder=_("Rechercher par immatriculation, modèle...") target_table="vehicles-table" %}
   </div>
 
   <div class="filter-bar__select">
@@ -128,14 +121,7 @@
       {% include "components/fleet/vehicle_card.html" with vehicle=vehicle view_mode="grid" %}
     {% endfor %}
   {% else %}
-    {% include "components/ui/empty_state.html" with
-        icon="fa-car"
-        title=_("Aucun véhicule trouvé")
-        subtitle=_("Modifiez vos filtres ou ajoutez un nouveau véhicule.")
-        cta_label=_("Ajouter un véhicule")
-        cta_href="/dashboard/vehicles/new/"
-        cta_icon="fa-plus"
-    %}
+    {% include "components/ui/empty_state.html" with icon="fa-car" title=_("Aucun véhicule trouvé") subtitle=_("Modifiez vos filtres ou ajoutez un nouveau véhicule.") cta_label=_("Ajouter un véhicule") cta_href="/dashboard/vehicles/new/" cta_icon="fa-plus" %}
   {% endif %}
 </div>
 
@@ -226,25 +212,13 @@
                 {{ vehicle.last_km|floatformat:0|default:"—" }}
               </td>
               <td data-label="{% trans 'Actions' %}">
-                {% include "components/tables/table_actions.html" with
-                    view_url=vehicle.detail_url
-                    edit_url=vehicle.edit_url
-                    delete_url=vehicle.delete_url
-                    delete_confirm_title=_("Supprimer ce véhicule ?")
-                %}
+                {% include "components/tables/table_actions.html" with view_url=vehicle.detail_url edit_url=vehicle.edit_url delete_url=vehicle.delete_url delete_confirm_title=_("Supprimer ce véhicule ?") %}
               </td>
             </tr>
           {% empty %}
             <tr>
               <td colspan="8" style="padding:0;border:none;">
-                {% include "components/ui/empty_state.html" with
-                    icon="fa-car"
-                    title=_("Aucun véhicule trouvé")
-                    subtitle=_("Modifiez vos filtres ou ajoutez votre premier véhicule.")
-                    cta_label=_("Ajouter un véhicule")
-                    cta_href="/dashboard/vehicles/new/"
-                    cta_icon="fa-plus"
-                %}
+                {% include "components/ui/empty_state.html" with icon="fa-car" title=_("Aucun véhicule trouvé") subtitle=_("Modifiez vos filtres ou ajoutez votre premier véhicule.") cta_label=_("Ajouter un véhicule") cta_href="/dashboard/vehicles/new/" cta_icon="fa-plus" %}
               </td>
             </tr>
           {% endfor %}

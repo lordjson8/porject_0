@@ -32,12 +32,7 @@
 
 {# Expiring Soon Alert #}
 {% if expiring_soon and expiring_soon > 0 %}
-  {% include "components/ui/alert.html" with
-      level="warning"
-      title=_("Documents à renouveler")
-      message=_("Certains documents expirent dans moins de 30 jours. Renouvelez-les rapidement.")
-      dismissible=True
-  %}
+  {% include "components/ui/alert.html" with level="warning" title=_("Documents à renouveler") message=_("Certains documents expirent dans moins de 30 jours. Renouvelez-les rapidement.") dismissible=True %}
 {% endif %}
 
 {# Filter Bar #}
@@ -115,22 +110,13 @@
               {% else %}—{% endif %}
             </td>
             <td>
-              {% include "components/tables/table_actions.html" with
-                  delete_url=doc.delete_url
-              %}
+              {% include "components/tables/table_actions.html" with delete_url=doc.delete_url %}
             </td>
           </tr>
         {% empty %}
           <tr>
             <td colspan="7" style="padding:0;border:none;">
-              {% include "components/ui/empty_state.html" with
-                  icon="fa-folder-open"
-                  title=_("Aucun document")
-                  subtitle=_("Ajoutez les documents administratifs de votre flotte.")
-                  cta_label=_("Ajouter un document")
-                  cta_modal="add-document-modal"
-                  cta_icon="fa-plus"
-              %}
+              {% include "components/ui/empty_state.html" with icon="fa-folder-open" title=_("Aucun document") subtitle=_("Ajoutez les documents administratifs de votre flotte.") cta_label=_("Ajouter un document") cta_modal="add-document-modal" cta_icon="fa-plus" %}
             </td>
           </tr>
         {% endfor %}

@@ -11,10 +11,7 @@
 
       {% if show_search %}
         <div style="max-width:280px;flex:1;">
-          {% include "components/forms/search_bar.html" with
-              placeholder=search_placeholder|default:_("Rechercher...")
-              target_table=table_id|default:'data-table'
-          %}
+          {% include "components/forms/search_bar.html" with placeholder=search_placeholder|default:_("Rechercher...") target_table=table_id|default:'data-table' %}
         </div>
       {% endif %}
     </div>
@@ -97,13 +94,7 @@
   </div>
 
   {# ── Empty State (shown via JS when filtered to 0 results) ── #}
-  {% include "components/ui/empty_state.html" with
-      icon=empty_icon|default:'fa-inbox'
-      title=empty_title|default:_('Aucun résultat')
-      subtitle=empty_subtitle
-      cta_label=empty_cta_label
-      cta_href=empty_cta_href
-  %}
+  {% include "components/ui/empty_state.html" with icon=empty_icon|default:'fa-inbox' title=empty_title|default:_('Aucun résultat') subtitle=empty_subtitle cta_label=empty_cta_label cta_href=empty_cta_href %}
 
   {# ── Pagination ── #}
   <div class="pagination" role="navigation" aria-label="{% trans 'Pagination' %}">

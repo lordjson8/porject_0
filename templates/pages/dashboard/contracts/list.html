@@ -99,22 +99,13 @@
               {% endif %}
             </td>
             <td>
-              {% include "components/tables/table_actions.html" with
-                  view_url=contract.detail_url
-                  delete_url=contract.delete_url
-              %}
+              {% include "components/tables/table_actions.html" with view_url=contract.detail_url delete_url=contract.delete_url %}
             </td>
           </tr>
         {% empty %}
           <tr>
             <td colspan="9" style="padding:0;border:none;">
-              {% include "components/ui/empty_state.html" with
-                  icon="fa-file-contract"
-                  title=_("Aucun contrat")
-                  subtitle=_("Commencez par créer votre premier contrat.")
-                  cta_label=_("Nouveau contrat")
-                  cta_icon="fa-plus"
-              %}
+              {% include "components/ui/empty_state.html" with icon="fa-file-contract" title=_("Aucun contrat") subtitle=_("Commencez par créer votre premier contrat.") cta_label=_("Nouveau contrat") cta_icon="fa-plus" %}
             </td>
           </tr>
         {% endfor %}

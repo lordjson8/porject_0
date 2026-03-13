@@ -71,23 +71,13 @@
               <span class="badge badge--primary">{{ model.vehicle_count|default:0 }}</span>
             </td>
             <td>
-              {% include "components/tables/table_actions.html" with
-                  edit_url=model.edit_url
-                  delete_url=model.delete_url
-              %}
+              {% include "components/tables/table_actions.html" with edit_url=model.edit_url delete_url=model.delete_url %}
             </td>
           </tr>
         {% empty %}
           <tr>
             <td colspan="5" style="padding:0;border:none;">
-              {% include "components/ui/empty_state.html" with
-                  icon="fa-car"
-                  title=_("Aucun modèle")
-                  subtitle=_("Ajoutez les marques et modèles de votre flotte.")
-                  cta_label=_("Ajouter un modèle")
-                  cta_modal="add-model-modal"
-                  cta_icon="fa-plus"
-              %}
+              {% include "components/ui/empty_state.html" with icon="fa-car" title=_("Aucun modèle") subtitle=_("Ajoutez les marques et modèles de votre flotte.") cta_label=_("Ajouter un modèle") cta_modal="add-model-modal" cta_icon="fa-plus" %}
             </td>
           </tr>
         {% endfor %}
@@ -99,12 +89,6 @@
 </div>
 
 {# ── Add Model Modal ── #}
-{% include "components/ui/modal.html" with
-    modal_id="add-model-modal"
-    title=_("Nouveau modèle de véhicule")
-    size="md"
-    confirm_label=_("Enregistrer")
-    confirm_variant="primary"
-%}
+{% include "components/ui/modal.html" with modal_id="add-model-modal" title=_("Nouveau modèle de véhicule") size="md" confirm_label=_("Enregistrer") confirm_variant="primary" %}
 
 {% endblock %}
