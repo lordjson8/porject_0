@@ -1,0 +1,55 @@
+{% load i18n %}
+
+<div class="service-item">
+  {# Icon #}
+  <div class="service-item__icon" aria-hidden="true">
+    {% if service.type == "oil" %}
+      <i class="fa-solid fa-oil-can"></i>
+    {% elif service.type == "tires" %}
+      <i class="fa-solid fa-circle-dot"></i>
+    {% elif service.type == "brakes" %}
+      <i class="fa-solid fa-circle-stop"></i>
+    {% elif service.type == "battery" %}
+      <i class="fa-solid fa-car-battery"></i>
+    {% elif service.type == "inspection" %}
+      <i class="fa-solid fa-clipboard-check"></i>
+    {% else %}
+      <i class="fa-solid fa-wrench"></i>
+    {% endif %}
+  </div>
+
+  {# Info #}
+  <div class="service-item__info">
+    <p class="service-item__title">{{ service.title }}</p>
+    <p class="service-item__date">
+      {% if service.date %}
+        <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+        {{ service.date|date:"d/m/Y" }}
+      {% endif %}
+      {% if service.km %}
+        &nbsp;·&nbsp;
+        <i class="fa-solid fa-road" aria-hidden="true"></i>
+        {{ service.km|floatformat:0 }} km
+      {% endif %}
+      {% if service.technician %}
+        &nbsp;·&nbsp;{{ service.technician }}
+      {% endif %}
+    </p>
+  </div>
+
+  {# Cost #}
+  {% if service.cost %}
+    <div class="service-item__cost" aria-label="{% trans 'Coût' %}">
+      {{ service.cost|floatformat:2 }} DA
+    </div>
+  {% endif %}
+
+  {# Status Badge #}
+  {% if service.status == "done" %}
+    <span class="badge badge--success">{% trans "Effectué" %}</span>
+  {% elif service.status == "pending" %}
+    <span class="badge badge--warning">{% trans "Planifié" %}</span>
+  {% elif service.status == "overdue" %}
+    <span class="badge badge--danger">{% trans "En retard" %}</span>
+  {% endif %}
+</div>

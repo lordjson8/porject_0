@@ -1,0 +1,63 @@
+{% load i18n %}
+
+{% if page_obj %}
+<nav class="pagination" role="navigation" aria-label="{% trans 'Pagination' %}">
+  <span class="pagination__info">
+    {% blocktrans with start=page_obj.start_index end=page_obj.end_index total=page_obj.paginator.count %}
+      Affichage de {{ start }}–{{ end }} sur {{ total }}
+    {% endblocktrans %}
+  </span>
+
+  <div class="pagination__controls" role="list">
+    {# Previous #}
+    {% if page_obj.has_previous %}
+      <a class="page-btn"
+         href="?page={{ page_obj.previous_page_number }}"
+         aria-label="{% trans 'Page précédente' %}"
+         role="listitem">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </a>
+    {% else %}
+      <span class="page-btn is-disabled" aria-disabled="true" role="listitem">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </span>
+    {% endif %}
+
+    {# Page numbers #}
+    {% for page_num in page_obj.paginator.page_range %}
+      {% if page_num == page_obj.number %}
+        <span class="page-btn is-active"
+              aria-current="page"
+              aria-label="{% trans 'Page' %} {{ page_num }}"
+              role="listitem">{{ page_num }}</span>
+      {% elif page_num == 1 or page_num == page_obj.paginator.num_pages %}
+        <a class="page-btn"
+           href="?page={{ page_num }}"
+           aria-label="{% trans 'Page' %} {{ page_num }}"
+           role="listitem">{{ page_num }}</a>
+      {% elif page_num >= page_obj.number|add:"-2" and page_num <= page_obj.number|add:"2" %}
+        <a class="page-btn"
+           href="?page={{ page_num }}"
+           aria-label="{% trans 'Page' %} {{ page_num }}"
+           role="listitem">{{ page_num }}</a>
+      {% elif page_num == page_obj.number|add:"-3" or page_num == page_obj.number|add:"3" %}
+        <span class="page-btn page-btn--ellipsis" aria-hidden="true" role="listitem">…</span>
+      {% endif %}
+    {% endfor %}
+
+    {# Next #}
+    {% if page_obj.has_next %}
+      <a class="page-btn"
+         href="?page={{ page_obj.next_page_number }}"
+         aria-label="{% trans 'Page suivante' %}"
+         role="listitem">
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </a>
+    {% else %}
+      <span class="page-btn is-disabled" aria-disabled="true" role="listitem">
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </span>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}

@@ -1,0 +1,31 @@
+{% extends "base/base_auth.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Déconnexion" %}{% endblock %}
+{% block auth_title %}{% trans "Déconnexion" %}{% endblock %}
+{% block auth_subtitle %}{% trans "Vous êtes sur le point de vous déconnecter." %}{% endblock %}
+
+{% block auth_form %}
+  <div style="text-align:center;padding:var(--space-4) 0;">
+    <div style="width:72px;height:72px;background:var(--color-danger-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto var(--space-5);">
+      <i class="fa-solid fa-right-from-bracket" style="font-size:28px;color:var(--color-danger);" aria-hidden="true"></i>
+    </div>
+    <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-6);">
+      {% trans "Êtes-vous sûr de vouloir vous déconnecter ?" %}
+    </p>
+
+    <form method="post" action="{% url 'auth:logout' %}">
+      {% csrf_token %}
+      <div style="display:flex;gap:var(--space-3);justify-content:center;">
+        <a class="btn btn--secondary"
+           href="{% url 'dashboard:home' %}">
+          {% trans "Rester connecté" %}
+        </a>
+        <button type="submit" class="btn btn--danger">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          {% trans "Se déconnecter" %}
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

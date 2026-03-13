@@ -1,0 +1,6 @@
+{% load i18n %}
+<span class="spinner spinner--{{ size|default:'md' }}{% if color %} spinner--{{ color }}{% endif %}"
+      role="status"
+      aria-label="{% trans 'Chargement...' %}">
+  <span class="d-none">{% trans "Chargement..." %}</span>
+</span>

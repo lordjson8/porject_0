@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div class="avatar avatar--{{ size|default:'md' }}"
+     aria-label="{% if user %}{{ user.get_full_name|default:user.username }}{% else %}{{ initials }}{% endif %}"
+     title="{% if user %}{{ user.get_full_name|default:user.username }}{% endif %}">
+  {% if image_url %}
+    <img src="{{ image_url }}" alt="{% if user %}{{ user.get_full_name|default:user.username }}{% else %}{% trans 'Avatar' %}{% endif %}" loading="lazy">
+  {% else %}
+    {% if initials %}
+      {{ initials|upper }}
+    {% elif user %}
+      {% with name=user.get_full_name %}
+        {% if name %}
+          {{ name|slice:":1"|upper }}{% if name|wordcount > 1 %}{{ name.split.1|slice:":1"|upper }}{% endif %}
+        {% else %}
+          {{ user.username|slice:":2"|upper }}
+        {% endif %}
+      {% endwith %}
+    {% else %}
+      <i class="fa-solid fa-user" aria-hidden="true"></i>
+    {% endif %}
+  {% endif %}
+</div>

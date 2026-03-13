@@ -1,0 +1,199 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Paramètres" %}{% endblock %}
+{% block page_title %}{% trans "Paramètres" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Paramètres" %}</h1>
+    <p class="page-header__subtitle">{% trans "Configuration de l'application FleetManager." %}</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div style="display:flex;gap:var(--space-6);align-items:flex-start;">
+
+  {# ── Settings Sidebar Nav ── #}
+  <div style="width:240px;flex-shrink:0;">
+    <div class="card">
+      <div class="card__header">
+        <h2 class="card__title">{% trans "Catégories" %}</h2>
+      </div>
+      <div class="card__body" style="padding:var(--space-2) 0;">
+        {% with active_section=active_section|default:'fuel-types' %}
+
+        {% for section in settings_sections %}
+          <a href="?section={{ section.id }}"
+             class="nav-item__link{% if active_section == section.id %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);width:calc(100% - var(--space-4));">
+            <i class="fa-solid {{ section.icon }} nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{{ section.label }}</span>
+          </a>
+        {% empty %}
+          {# Default sections #}
+          <a href="?section=fuel-types"
+             class="nav-item__link{% if active_section == 'fuel-types' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-gas-pump nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Types de carburant" %}</span>
+          </a>
+          <a href="?section=transmissions"
+             class="nav-item__link{% if active_section == 'transmissions' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-gears nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Transmissions" %}</span>
+          </a>
+          <a href="?section=intervention-types"
+             class="nav-item__link{% if active_section == 'intervention-types' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-wrench nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Types d'intervention" %}</span>
+          </a>
+          <a href="?section=document-types"
+             class="nav-item__link{% if active_section == 'document-types' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-folder nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Types de document" %}</span>
+          </a>
+          <a href="?section=units"
+             class="nav-item__link{% if active_section == 'units' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-ruler nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Unités" %}</span>
+          </a>
+          <a href="?section=periods"
+             class="nav-item__link{% if active_section == 'periods' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-calendar nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Périodes" %}</span>
+          </a>
+          <div class="user-menu__separator"></div>
+          <a href="?section=users"
+             class="nav-item__link{% if active_section == 'users' %} is-active{% endif %}"
+             style="border-radius:var(--radius-sm);margin:2px var(--space-2);">
+            <i class="fa-solid fa-users nav-item__icon" aria-hidden="true" style="color:var(--color-primary);"></i>
+            <span style="font-size:var(--text-sm);">{% trans "Utilisateurs" %}</span>
+          </a>
+        {% endfor %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Settings Content Area ── #}
+  <div style="flex:1;min-width:0;">
+
+    {# CRUD List + Inline Form Pattern #}
+    <div class="card">
+      <div class="card__header">
+        <div>
+          <h2 class="card__title">{{ section_title|default:_("Configuration") }}</h2>
+          <p class="card__subtitle">{{ section_subtitle|default:"" }}</p>
+        </div>
+        <button class="btn btn--primary btn--sm" data-modal-trigger="add-setting-modal">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          {% trans "Ajouter" %}
+        </button>
+      </div>
+      <div class="card__body" style="padding:0;">
+        <div style="overflow-x:auto;">
+          <table class="data-table" aria-label="{{ section_title|default:_('Paramètres') }}">
+            <thead>
+              <tr>
+                <th class="sortable">{% trans "Libellé" %}</th>
+                <th class="sortable">{% trans "Code" %}</th>
+                <th class="sortable">{% trans "Ordre" %}</th>
+                <th class="sortable">{% trans "Actif" %}</th>
+                <th style="width:100px;">{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in setting_items %}
+                <tr>
+                  <td data-label="{% trans 'Libellé' %}">{{ item.label }}</td>
+                  <td data-label="{% trans 'Code' %}">
+                    <code style="font-family:var(--font-mono);font-size:var(--text-xs);background:var(--color-bg-muted);padding:2px var(--space-1);border-radius:var(--radius-sm);">
+                      {{ item.code }}
+                    </code>
+                  </td>
+                  <td data-label="{% trans 'Ordre' %}">{{ item.order|default:"—" }}</td>
+                  <td data-label="{% trans 'Actif' %}">
+                    {% if item.is_active %}
+                      <span class="badge badge--success">{% trans "Oui" %}</span>
+                    {% else %}
+                      <span class="badge badge--neutral">{% trans "Non" %}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% include "components/tables/table_actions.html" with edit_url=item.edit_url delete_url=item.delete_url %}
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="5" style="padding:0;border:none;">
+                    {% include "components/ui/empty_state.html" with
+                        icon="fa-gear"
+                        title=_("Aucun élément")
+                        subtitle=_("Ajoutez votre premier élément de configuration.")
+                        cta_label=_("Ajouter")
+                        cta_modal="add-setting-modal"
+                        cta_icon="fa-plus"
+                    %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{# Add Setting Modal #}
+<div class="modal-backdrop" data-modal-id="add-setting-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal modal--sm">
+    <div class="modal__header">
+      <h2 class="modal__title">{% trans "Ajouter un élément" %}</h2>
+      <button class="modal__close" data-modal-close="add-setting-modal" aria-label="{% trans 'Fermer' %}">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modal__body">
+      <div class="form-group">
+        <label class="form-label" for="setting-label">
+          {% trans "Libellé" %} <span class="required" aria-hidden="true">*</span>
+        </label>
+        <input type="text" id="setting-label" class="form-control"
+               placeholder="{% trans 'Ex: Essence' %}" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="setting-code">{% trans "Code" %}</label>
+        <input type="text" id="setting-code" class="form-control"
+               placeholder="{% trans 'Ex: ESSENCE' %}"
+               style="font-family:var(--font-mono);">
+      </div>
+      <div class="form-group">
+        <label class="toggle">
+          <input type="checkbox" class="toggle__input" checked>
+          <span class="toggle__track"><span class="toggle__thumb"></span></span>
+          <span class="toggle__label">{% trans "Actif" %}</span>
+        </label>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--secondary" data-modal-close="add-setting-modal">{% trans "Annuler" %}</button>
+      <button class="btn btn--primary">
+        <i class="fa-solid fa-check" aria-hidden="true"></i>
+        {% trans "Enregistrer" %}
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

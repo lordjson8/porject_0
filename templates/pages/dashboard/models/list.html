@@ -1,0 +1,110 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% trans "Modèles de véhicules" %}{% endblock %}
+{% block page_title %}{% trans "Modèles" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Modèles de véhicules" %}</h1>
+    <p class="page-header__subtitle">{% trans "Gérez les marques et modèles de votre parc." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--primary" data-modal-trigger="add-model-modal">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouveau modèle" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="table-wrapper" data-table="models-table">
+  <div class="table-toolbar">
+    <div class="table-toolbar__left">
+      <div style="max-width:280px;">
+        {% include "components/forms/search_bar.html" with placeholder=_("Rechercher un modèle...") target_table="models-table" %}
+      </div>
+    </div>
+    <div class="table-toolbar__right">
+      <div class="rows-per-page">
+        <label>{% trans "Afficher" %}</label>
+        <select data-rows-per-page>
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+          <option value="50">50</option>
+        </select>
+        <span>{% trans "lignes" %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="data-table" aria-label="{% trans 'Modèles de véhicules' %}">
+      <thead>
+        <tr>
+          <th class="sortable">{% trans "Marque" %}</th>
+          <th class="sortable">{% trans "Modèle" %}</th>
+          <th class="sortable">{% trans "Catégorie" %}</th>
+          <th class="sortable">{% trans "Nombre de véhicules" %}</th>
+          <th style="width:100px;">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for model in models %}
+          <tr>
+            <td data-label="{% trans 'Marque' %}">
+              <div style="display:flex;align-items:center;gap:var(--space-2);">
+                <div style="width:32px;height:32px;background:var(--color-bg-muted);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:var(--text-sm);font-weight:var(--font-bold);color:var(--color-text-muted);">
+                  {{ model.brand|slice:":1" }}
+                </div>
+                <span class="font-medium">{{ model.brand }}</span>
+              </div>
+            </td>
+            <td data-label="{% trans 'Modèle' %}">{{ model.name }}</td>
+            <td data-label="{% trans 'Catégorie' %}">
+              <span class="badge badge--neutral">{{ model.category|default:"—" }}</span>
+            </td>
+            <td data-label="{% trans 'Véhicules' %}">
+              <span class="badge badge--primary">{{ model.vehicle_count|default:0 }}</span>
+            </td>
+            <td>
+              {% include "components/tables/table_actions.html" with
+                  edit_url=model.edit_url
+                  delete_url=model.delete_url
+              %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" style="padding:0;border:none;">
+              {% include "components/ui/empty_state.html" with
+                  icon="fa-car"
+                  title=_("Aucun modèle")
+                  subtitle=_("Ajoutez les marques et modèles de votre flotte.")
+                  cta_label=_("Ajouter un modèle")
+                  cta_modal="add-model-modal"
+                  cta_icon="fa-plus"
+              %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "components/tables/pagination.html" with page_obj=models %}
+</div>
+
+{# ── Add Model Modal ── #}
+{% include "components/ui/modal.html" with
+    modal_id="add-model-modal"
+    title=_("Nouveau modèle de véhicule")
+    size="md"
+    confirm_label=_("Enregistrer")
+    confirm_variant="primary"
+%}
+
+{% endblock %}

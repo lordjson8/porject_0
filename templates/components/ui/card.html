@@ -1,0 +1,25 @@
+{% load i18n %}
+
+<div class="card{% if hoverable %} card--hover{% endif %}">
+  {% if title %}
+  <div class="card__header">
+    <div>
+      <h3 class="card__title">{{ title }}</h3>
+      {% if subtitle %}
+        <p class="card__subtitle">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    {% if card_actions %}
+      <div class="card__actions">{{ card_actions }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="card__body">
+    {% if body_html %}{{ body_html }}{% else %}{% block card_body %}{% endblock %}{% endif %}
+  </div>
+
+  {% if footer_html %}
+  <div class="card__footer">{{ footer_html }}</div>
+  {% endif %}
+</div>

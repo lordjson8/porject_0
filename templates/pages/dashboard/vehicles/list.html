@@ -1,0 +1,291 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% trans "Véhicules" %}{% endblock %}
+{% block page_title %}{% trans "Véhicules" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">{% trans "Véhicules" %}</h1>
+    <p class="page-header__subtitle">
+      {% blocktrans count count=total_count|default:0 %}
+        {{ count }} véhicule dans le parc
+      {% plural %}
+        {{ count }} véhicules dans le parc
+      {% endblocktrans %}
+    </p>
+  </div>
+  <div class="page-header__actions">
+    {% include "components/navigation/breadcrumb.html" with
+        items=breadcrumb_items|default:vehicle_breadcrumbs
+    %}
+    {# View Toggle: grid / list #}
+    <div class="d-flex gap-1">
+      <button class="btn btn--secondary btn--sm btn--icon"
+              id="view-grid-btn"
+              onclick="setViewMode('grid')"
+              aria-label="{% trans 'Vue grille' %}"
+              title="{% trans 'Vue grille' %}">
+        <i class="fa-solid fa-grip" aria-hidden="true"></i>
+      </button>
+      <button class="btn btn--secondary btn--sm btn--icon"
+              id="view-list-btn"
+              onclick="setViewMode('list')"
+              aria-label="{% trans 'Vue liste' %}"
+              title="{% trans 'Vue liste' %}">
+        <i class="fa-solid fa-list" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <a class="btn btn--primary"
+       href="{% url 'dashboard:vehicles-new' %}"
+       aria-label="{% trans 'Ajouter un véhicule' %}">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouveau véhicule" %}
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ── Filter Bar ── #}
+<form method="get" class="filter-bar" role="search" aria-label="{% trans 'Filtres véhicules' %}">
+  <div class="filter-bar__search">
+    {% include "components/forms/search_bar.html" with
+        name="q"
+        value=request.GET.q
+        placeholder=_("Rechercher par immatriculation, modèle...")
+        target_table="vehicles-table"
+    %}
+  </div>
+
+  <div class="filter-bar__select">
+    <select name="status"
+            class="form-control form-select"
+            aria-label="{% trans 'Filtrer par statut' %}"
+            onchange="this.form.submit()">
+      <option value="">{% trans "Tous les statuts" %}</option>
+      <option value="inscrit" {% if request.GET.status == 'inscrit' %}selected{% endif %}>{% trans "Inscrit" %}</option>
+      <option value="service" {% if request.GET.status == 'service' %}selected{% endif %}>{% trans "En service" %}</option>
+      <option value="maintenance" {% if request.GET.status == 'maintenance' %}selected{% endif %}>{% trans "En maintenance" %}</option>
+      <option value="commander" {% if request.GET.status == 'commander' %}selected{% endif %}>{% trans "À commander" %}</option>
+      <option value="demande" {% if request.GET.status == 'demande' %}selected{% endif %}>{% trans "Nouvelle demande" %}</option>
+      <option value="declasse" {% if request.GET.status == 'declasse' %}selected{% endif %}>{% trans "Déclassé" %}</option>
+    </select>
+  </div>
+
+  <div class="filter-bar__select">
+    <select name="category"
+            class="form-control form-select"
+            aria-label="{% trans 'Filtrer par catégorie' %}"
+            onchange="this.form.submit()">
+      <option value="">{% trans "Toutes catégories" %}</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:'s' %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div style="display:flex;gap:var(--space-2);">
+    <input type="date"
+           name="date_from"
+           class="form-control"
+           value="{{ request.GET.date_from }}"
+           placeholder="{% trans 'Du' %}"
+           aria-label="{% trans 'Date de début' %}"
+           style="width:140px">
+    <input type="date"
+           name="date_to"
+           class="form-control"
+           value="{{ request.GET.date_to }}"
+           placeholder="{% trans 'Au' %}"
+           aria-label="{% trans 'Date de fin' %}"
+           style="width:140px">
+  </div>
+
+  <div class="filter-bar__actions">
+    {% if request.GET %}
+      <a class="btn btn--ghost btn--sm" href="{% url 'dashboard:vehicles-list' %}">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+        {% trans "Réinitialiser" %}
+      </a>
+    {% endif %}
+    <button type="submit" class="btn btn--secondary btn--sm">
+      <i class="fa-solid fa-filter" aria-hidden="true"></i>
+      {% trans "Filtrer" %}
+    </button>
+  </div>
+</form>
+
+{# ── Grid View ── #}
+<div id="vehicles-grid-view" class="vehicles-grid grid grid-cols-4 gap-4 mb-4" style="display:none;">
+  {% if vehicles %}
+    {% for vehicle in vehicles %}
+      {% include "components/fleet/vehicle_card.html" with vehicle=vehicle view_mode="grid" %}
+    {% endfor %}
+  {% else %}
+    {% include "components/ui/empty_state.html" with
+        icon="fa-car"
+        title=_("Aucun véhicule trouvé")
+        subtitle=_("Modifiez vos filtres ou ajoutez un nouveau véhicule.")
+        cta_label=_("Ajouter un véhicule")
+        cta_href="/dashboard/vehicles/new/"
+        cta_icon="fa-plus"
+    %}
+  {% endif %}
+</div>
+
+{# ── Table View ── #}
+<div id="vehicles-list-view" data-table="vehicles-table">
+
+  <div class="table-wrapper">
+    {# Toolbar #}
+    <div class="table-toolbar">
+      <div class="table-toolbar__left">
+        <h2 class="table-toolbar__title">
+          {% blocktrans count count=vehicles.paginator.count|default:0 %}
+            {{ count }} résultat
+          {% plural %}
+            {{ count }} résultats
+          {% endblocktrans %}
+        </h2>
+      </div>
+      <div class="table-toolbar__right">
+        <div class="rows-per-page">
+          <label for="rpp-vehicles">{% trans "Afficher" %}</label>
+          <select id="rpp-vehicles" data-rows-per-page aria-label="{% trans 'Lignes par page' %}">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+          </select>
+          <span>{% trans "lignes" %}</span>
+        </div>
+
+        <button class="btn btn--secondary btn--sm">
+          <i class="fa-solid fa-download" aria-hidden="true"></i>
+          {% trans "Exporter" %}
+        </button>
+      </div>
+    </div>
+
+    {# Bulk Actions Bar #}
+    <div class="bulk-actions-bar">
+      <span class="bulk-actions-bar__count"></span>
+      <button class="btn btn--danger btn--sm"
+              onclick="confirmAction({title:'{% trans 'Supprimer la sélection' %}',message:'{% trans 'Cette action est irréversible.' %}',label:'{% trans 'Supprimer' %}',danger:true})">
+        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+        {% trans "Supprimer" %}
+      </button>
+    </div>
+
+    {# Table #}
+    <div style="overflow-x:auto;">
+      <table class="data-table" aria-label="{% trans 'Liste des véhicules' %}">
+        <thead>
+          <tr>
+            <th class="col-check">
+              <input type="checkbox" data-check-all class="form-check__input" style="margin:0"
+                     aria-label="{% trans 'Tout sélectionner' %}">
+            </th>
+            <th class="sortable">{% trans "Immatriculation" %}</th>
+            <th class="sortable">{% trans "Modèle" %}</th>
+            <th class="sortable">{% trans "Catégorie" %}</th>
+            <th class="sortable">{% trans "Conducteur" %}</th>
+            <th class="sortable">{% trans "Statut" %}</th>
+            <th class="sortable">{% trans "Dernier KM" %}</th>
+            <th style="width:120px;">{% trans "Actions" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for vehicle in vehicles %}
+            <tr>
+              <td class="col-check">
+                <input type="checkbox"
+                       data-row-check
+                       class="form-check__input"
+                       style="margin:0"
+                       value="{{ vehicle.id }}"
+                       aria-label="{% trans 'Sélectionner' %} {{ vehicle.plate }}">
+              </td>
+              <td data-label="{% trans 'Immatriculation' %}">
+                <a class="cell-plate cell-link" href="{{ vehicle.detail_url|default:'#' }}">
+                  {{ vehicle.plate }}
+                </a>
+              </td>
+              <td data-label="{% trans 'Modèle' %}">{{ vehicle.model_name }}</td>
+              <td data-label="{% trans 'Catégorie' %}">{{ vehicle.category|default:"—" }}</td>
+              <td data-label="{% trans 'Conducteur' %}">{{ vehicle.driver_name|default:"—" }}</td>
+              <td data-label="{% trans 'Statut' %}">
+                {% include "components/fleet/status_badge.html" with status=vehicle.status %}
+              </td>
+              <td data-label="{% trans 'Dernier KM' %}">
+                {{ vehicle.last_km|floatformat:0|default:"—" }}
+              </td>
+              <td data-label="{% trans 'Actions' %}">
+                {% include "components/tables/table_actions.html" with
+                    view_url=vehicle.detail_url
+                    edit_url=vehicle.edit_url
+                    delete_url=vehicle.delete_url
+                    delete_confirm_title=_("Supprimer ce véhicule ?")
+                %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" style="padding:0;border:none;">
+                {% include "components/ui/empty_state.html" with
+                    icon="fa-car"
+                    title=_("Aucun véhicule trouvé")
+                    subtitle=_("Modifiez vos filtres ou ajoutez votre premier véhicule.")
+                    cta_label=_("Ajouter un véhicule")
+                    cta_href="/dashboard/vehicles/new/"
+                    cta_icon="fa-plus"
+                %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# Server-side Pagination #}
+    {% include "components/tables/pagination.html" with page_obj=vehicles %}
+
+  </div>{# /table-wrapper #}
+</div>{# /vehicles-list-view #}
+
+<script>
+(function() {
+  var VIEW_KEY = 'fm_vehicles_view';
+  function setViewMode(mode) {
+    var grid = document.getElementById('vehicles-grid-view');
+    var list = document.getElementById('vehicles-list-view');
+    var gridBtn = document.getElementById('view-grid-btn');
+    var listBtn = document.getElementById('view-list-btn');
+    if (mode === 'grid') {
+      grid.style.display = 'grid';
+      list.style.display = 'none';
+      gridBtn.classList.add('btn--primary');
+      gridBtn.classList.remove('btn--secondary');
+      listBtn.classList.add('btn--secondary');
+      listBtn.classList.remove('btn--primary');
+    } else {
+      grid.style.display = 'none';
+      list.style.display = 'block';
+      listBtn.classList.add('btn--primary');
+      listBtn.classList.remove('btn--secondary');
+      gridBtn.classList.add('btn--secondary');
+      gridBtn.classList.remove('btn--primary');
+    }
+    localStorage.setItem(VIEW_KEY, mode);
+  }
+  window.setViewMode = setViewMode;
+  setViewMode(localStorage.getItem(VIEW_KEY) || 'list');
+}());
+</script>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% trans "Services & maintenance" %}{% endblock %}
+{% block page_title %}{% trans "Services" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Services & Maintenance" %}</h1>
+    <p class="page-header__subtitle">{% trans "Suivi des interventions et entretiens du parc." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--primary" data-modal-trigger="add-service-modal">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouveau service" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# KPI Row #}
+<div class="grid grid-cols-4 gap-4 mb-6 stats-grid">
+  {% include "components/charts/stat_card.html" with title=_("Total services") value=total_services|default:0 icon="fa-wrench" color="orange" %}
+  {% include "components/charts/stat_card.html" with title=_("Planifiés") value=planned_services|default:0 icon="fa-calendar-check" color="blue" %}
+  {% include "components/charts/stat_card.html" with title=_("En retard") value=overdue_services|default:0 icon="fa-triangle-exclamation" color="red" %}
+  {% include "components/charts/stat_card.html" with title=_("Coût total") value=total_cost|default:0 icon="fa-coins" color="green" %}
+</div>
+
+<div class="table-wrapper" data-table="services-table">
+  <div class="table-toolbar">
+    <div class="table-toolbar__left">
+      <div style="max-width:300px;">
+        {% include "components/forms/search_bar.html" with placeholder=_("Rechercher...") target_table="services-table" %}
+      </div>
+    </div>
+    <div class="table-toolbar__right">
+      <div class="rows-per-page">
+        <label>{% trans "Afficher" %}</label>
+        <select data-rows-per-page>
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+        </select>
+        <span>{% trans "lignes" %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="data-table" aria-label="{% trans 'Services' %}">
+      <thead>
+        <tr>
+          <th class="sortable">{% trans "Véhicule" %}</th>
+          <th class="sortable">{% trans "Type d'intervention" %}</th>
+          <th class="sortable">{% trans "Date" %}</th>
+          <th class="sortable">{% trans "KM" %}</th>
+          <th class="sortable">{% trans "Technicien" %}</th>
+          <th class="sortable">{% trans "Coût (DA)" %}</th>
+          <th class="sortable">{% trans "Statut" %}</th>
+          <th style="width:100px;">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for service in services %}
+          <tr>
+            <td data-label="{% trans 'Véhicule' %}">
+              <a class="cell-link" href="#">{{ service.vehicle_plate|default:"—" }}</a>
+            </td>
+            <td data-label="{% trans 'Type' %}">{{ service.title }}</td>
+            <td data-label="{% trans 'Date' %}">{{ service.date|date:"d/m/Y"|default:"—" }}</td>
+            <td data-label="{% trans 'KM' %}">{{ service.km|floatformat:0|default:"—" }}</td>
+            <td data-label="{% trans 'Technicien' %}">{{ service.technician|default:"—" }}</td>
+            <td data-label="{% trans 'Coût' %}">{{ service.cost|floatformat:2|default:"—" }}</td>
+            <td data-label="{% trans 'Statut' %}">
+              {% if service.status == "done" %}<span class="badge badge--success">{% trans "Effectué" %}</span>
+              {% elif service.status == "pending" %}<span class="badge badge--warning">{% trans "Planifié" %}</span>
+              {% elif service.status == "overdue" %}<span class="badge badge--danger">{% trans "En retard" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% include "components/tables/table_actions.html" with
+                  view_url=service.detail_url
+                  edit_url=service.edit_url
+                  delete_url=service.delete_url
+              %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="8" style="padding:0;border:none;">
+              {% include "components/ui/empty_state.html" with icon="fa-wrench" title=_("Aucun service") subtitle=_("Planifiez votre premier entretien.") cta_label=_("Nouveau service") cta_modal="add-service-modal" cta_icon="fa-plus" %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "components/tables/pagination.html" with page_obj=services %}
+</div>
+
+{% include "components/ui/modal.html" with modal_id="add-service-modal" title=_("Nouveau service") size="md" confirm_label=_("Enregistrer") %}
+
+{% endblock %}

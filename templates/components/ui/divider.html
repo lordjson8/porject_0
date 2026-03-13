@@ -1,0 +1,11 @@
+{% if orientation == "vertical" %}
+  <span class="divider--vertical" role="separator" aria-hidden="true"></span>
+{% elif label %}
+  <div style="display:flex;align-items:center;gap:var(--space-3);margin:var(--space-4) 0;" role="separator">
+    <hr class="divider" style="flex:1;margin:0;">
+    <span class="text-xs text-muted font-medium" style="white-space:nowrap;">{{ label }}</span>
+    <hr class="divider" style="flex:1;margin:0;">
+  </div>
+{% else %}
+  <hr class="divider" role="separator">
+{% endif %}

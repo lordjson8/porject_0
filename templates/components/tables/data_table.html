@@ -1,0 +1,114 @@
+{% load i18n %}
+
+<div class="table-wrapper" data-table="{{ table_id|default:'data-table' }}">
+
+  {# ── Toolbar ── #}
+  <div class="table-toolbar">
+    <div class="table-toolbar__left">
+      {% if title %}
+        <h3 class="table-toolbar__title">{{ title }}</h3>
+      {% endif %}
+
+      {% if show_search %}
+        <div style="max-width:280px;flex:1;">
+          {% include "components/forms/search_bar.html" with
+              placeholder=search_placeholder|default:_("Rechercher...")
+              target_table=table_id|default:'data-table'
+          %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="table-toolbar__right">
+      {# Rows per page #}
+      <div class="rows-per-page">
+        <label for="rpp-{{ table_id }}">{% trans "Afficher" %}</label>
+        <select id="rpp-{{ table_id }}" data-rows-per-page aria-label="{% trans 'Lignes par page' %}">
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span>{% trans "lignes" %}</span>
+      </div>
+
+      {% if table_actions %}
+        {{ table_actions }}
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Bulk Actions Bar ── #}
+  {% if show_bulk %}
+    <div class="bulk-actions-bar" role="status" aria-live="polite">
+      <span class="bulk-actions-bar__count">0 {% trans "élément(s) sélectionné(s)" %}</span>
+      <button class="btn btn--danger btn--sm">
+        <i class="fa-solid fa-trash" aria-hidden="true"></i>
+        {% trans "Supprimer la sélection" %}
+      </button>
+      <button class="btn btn--secondary btn--sm">
+        <i class="fa-solid fa-download" aria-hidden="true"></i>
+        {% trans "Exporter" %}
+      </button>
+    </div>
+  {% endif %}
+
+  {# ── Table ── #}
+  <div style="overflow-x:auto;">
+    <table class="data-table" aria-label="{{ title }}">
+      <thead>
+        <tr>
+          {% if show_bulk %}
+            <th class="col-check">
+              <input type="checkbox"
+                     data-check-all
+                     class="form-check__input"
+                     style="margin:0"
+                     aria-label="{% trans 'Tout sélectionner' %}">
+            </th>
+          {% endif %}
+
+          {% for header in headers %}
+            <th class="{% if header.sortable %}sortable{% endif %}"
+                {% if header.sortable %}
+                  role="columnheader"
+                  aria-sort="none"
+                  tabindex="0"
+                  onkeydown="if(event.key==='Enter')this.click()"
+                {% endif %}
+                {% if header.width %}style="width:{{ header.width }}"{% endif %}>
+              {{ header.label }}
+            </th>
+          {% empty %}
+            {# Fallback: render nothing, caller must provide headers #}
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% block table_rows %}
+          {% for row in rows %}
+            {% include "components/tables/table_row_generic.html" with row=row show_bulk=show_bulk %}
+          {% empty %}
+            {# No rows — empty state shown below #}
+          {% endfor %}
+        {% endblock %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ── Empty State (shown via JS when filtered to 0 results) ── #}
+  {% include "components/ui/empty_state.html" with
+      icon=empty_icon|default:'fa-inbox'
+      title=empty_title|default:_('Aucun résultat')
+      subtitle=empty_subtitle
+      cta_label=empty_cta_label
+      cta_href=empty_cta_href
+  %}
+
+  {# ── Pagination ── #}
+  <div class="pagination" role="navigation" aria-label="{% trans 'Pagination' %}">
+    <span class="pagination__info"></span>
+    <div class="pagination__controls" role="list"></div>
+  </div>
+
+</div>{# /table-wrapper #}

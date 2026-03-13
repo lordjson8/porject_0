@@ -1,0 +1,60 @@
+{% load i18n %}
+
+<div class="form-group">
+  {% if label %}
+    <label class="form-label"
+           for="{{ field.id_for_label|default:field.html_name }}">
+      {{ label }}
+      {% if required %}<span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <div class="textarea-wrapper">
+    <textarea id="{{ field.id_for_label|default:field.html_name }}"
+              name="{{ field.html_name }}"
+              class="form-control form-textarea{% if field.errors %} is-invalid{% endif %}"
+              rows="{{ rows|default:4 }}"
+              {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+              {% if required %}required aria-required="true"{% endif %}
+              {% if disabled %}disabled{% endif %}
+              {% if max_length %}maxlength="{{ max_length }}"
+                             data-max="{{ max_length }}"{% endif %}
+              {% if field.errors %}aria-describedby="error-{{ field.html_name }}"{% elif help_text %}aria-describedby="help-{{ field.html_name }}"{% endif %}
+              oninput="{% if max_length %}updateCounter(this){% endif %}">{{ field.value|default:"" }}</textarea>
+
+    {% if max_length %}
+      <span class="textarea-counter"
+            id="counter-{{ field.html_name }}"
+            aria-live="polite">
+        {% if field.value %}{{ field.value|length }}{% else %}0{% endif %}/{{ max_length }}
+      </span>
+    {% endif %}
+  </div>
+
+  {% if field.errors %}
+    <div class="form-error" id="error-{{ field.html_name }}" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      {{ field.errors|first }}
+    </div>
+  {% elif help_text %}
+    <p class="form-help" id="help-{{ field.html_name }}">{{ help_text }}</p>
+  {% endif %}
+</div>
+
+{% if max_length %}
+<script>
+(function() {
+  function updateCounter(textarea) {
+    var counter = document.getElementById('counter-' + textarea.name);
+    var max     = parseInt(textarea.getAttribute('data-max'), 10);
+    var len     = textarea.value.length;
+    if (counter) {
+      counter.textContent = len + '/' + max;
+      counter.className   = 'textarea-counter' +
+        (len >= max ? ' is-at-limit' : len > max * 0.85 ? ' is-near-limit' : '');
+    }
+  }
+  window.updateCounter = updateCounter;
+}());
+</script>
+{% endif %}

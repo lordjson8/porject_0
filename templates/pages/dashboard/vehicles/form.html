@@ -1,0 +1,279 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% if vehicle %}{% trans "Modifier le véhicule" %}{% else %}{% trans "Nouveau véhicule" %}{% endif %}{% endblock %}
+{% block page_title %}{% if vehicle %}{% trans "Modifier" %}{% else %}{% trans "Nouveau véhicule" %}{% endif %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">
+      {% if vehicle %}{% trans "Modifier le véhicule" %} — {{ vehicle.plate }}
+      {% else %}{% trans "Nouveau véhicule" %}{% endif %}
+    </h1>
+  </div>
+  <a class="btn btn--secondary" href="{% url 'dashboard:vehicles-list' %}">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    {% trans "Retour" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ── Stepper ── #}
+{% with steps=form_steps|default:default_steps current_step=current_step|default:1 %}
+  {% include "components/navigation/stepper.html" with
+      steps=steps
+      current_step=current_step
+      stepper_id="vehicle-stepper"
+  %}
+{% endwith %}
+
+<div class="card">
+  <div class="card__body">
+    <form method="post" enctype="multipart/form-data" novalidate id="vehicle-form">
+      {% csrf_token %}
+
+      {% include "components/forms/form_errors.html" with form=form %}
+
+      {# ── Step 0: Identification ── #}
+      <div data-step-panel="0">
+        <h2 class="section__title">{% trans "Identification du véhicule" %}</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="id_plate">
+              {% trans "Immatriculation" %}
+              <span class="required" aria-hidden="true">*</span>
+            </label>
+            <div class="input-group">
+              <i class="fa-solid fa-hashtag input-group__icon" aria-hidden="true"></i>
+              <input type="text"
+                     id="id_plate"
+                     name="plate"
+                     class="form-control{% if form.plate.errors %} is-invalid{% endif %}"
+                     placeholder="123-ABC-01"
+                     value="{{ form.plate.value|default:'' }}"
+                     required
+                     style="font-family:var(--font-mono);font-weight:var(--font-semibold);">
+            </div>
+            {% if form.plate.errors %}
+              <div class="form-error" role="alert">{{ form.plate.errors|first }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_chassis">{% trans "N° Châssis (VIN)" %}</label>
+            <input type="text"
+                   id="id_chassis"
+                   name="chassis_number"
+                   class="form-control"
+                   placeholder="VF1BCA00XAB123456"
+                   value="{{ form.chassis_number.value|default:'' }}"
+                   style="font-family:var(--font-mono);">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_category">
+              {% trans "Catégorie" %}
+              <span class="required" aria-hidden="true">*</span>
+            </label>
+            <select id="id_category"
+                    name="category"
+                    class="form-control form-select"
+                    required>
+              <option value="">{% trans "-- Sélectionner --" %}</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if form.category.value == cat.id|stringformat:'s' %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_status">{% trans "Statut" %}</label>
+            <select id="id_status" name="status" class="form-control form-select">
+              <option value="inscrit">{% trans "Inscrit" %}</option>
+              <option value="service">{% trans "En service" %}</option>
+              <option value="maintenance">{% trans "En maintenance" %}</option>
+              <option value="commander">{% trans "À commander" %}</option>
+              <option value="declasse">{% trans "Déclassé" %}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {# ── Step 1: Modèle ── #}
+      <div data-step-panel="1" style="display:none;">
+        <h2 class="section__title">{% trans "Modèle & caractéristiques" %}</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="id_model">
+              {% trans "Modèle" %}
+              <span class="required" aria-hidden="true">*</span>
+            </label>
+            <select id="id_model" name="model" class="form-control form-select" required>
+              <option value="">{% trans "-- Sélectionner un modèle --" %}</option>
+              {% for model in models %}
+                <option value="{{ model.id }}" {% if form.model.value == model.id|stringformat:'s' %}selected{% endif %}>
+                  {{ model.brand }} {{ model.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_year">{% trans "Année de fabrication" %}</label>
+            <input type="number"
+                   id="id_year"
+                   name="year"
+                   class="form-control"
+                   min="1990"
+                   max="2030"
+                   value="{{ form.year.value|default:'' }}"
+                   placeholder="2023">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_color">{% trans "Couleur" %}</label>
+            <input type="text" id="id_color" name="color" class="form-control"
+                   value="{{ form.color.value|default:'' }}" placeholder="{% trans 'Blanc, Noir...' %}">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_fuel_type">{% trans "Carburant" %}</label>
+            <select id="id_fuel_type" name="fuel_type" class="form-control form-select">
+              <option value="">{% trans "-- Sélectionner --" %}</option>
+              <option value="essence">{% trans "Essence" %}</option>
+              <option value="diesel">{% trans "Diesel" %}</option>
+              <option value="gpl">{% trans "GPL" %}</option>
+              <option value="electrique">{% trans "Électrique" %}</option>
+              <option value="hybride">{% trans "Hybride" %}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_transmission">{% trans "Transmission" %}</label>
+            <select id="id_transmission" name="transmission" class="form-control form-select">
+              <option value="">{% trans "-- Sélectionner --" %}</option>
+              <option value="manual">{% trans "Manuelle" %}</option>
+              <option value="automatic">{% trans "Automatique" %}</option>
+              <option value="semi-auto">{% trans "Semi-automatique" %}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="id_seats">{% trans "Nombre de places" %}</label>
+            <input type="number" id="id_seats" name="seats" class="form-control"
+                   min="1" max="60" value="{{ form.seats.value|default:'' }}" placeholder="5">
+          </div>
+        </div>
+      </div>
+
+      {# ── Step 2: Fiscal ── #}
+      <div data-step-panel="2" style="display:none;">
+        <h2 class="section__title">{% trans "Informations fiscales" %}</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="id_fiscal_power">{% trans "Puissance fiscale (CV)" %}</label>
+            <input type="number" id="id_fiscal_power" name="fiscal_power" class="form-control"
+                   value="{{ form.fiscal_power.value|default:'' }}" placeholder="7">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_purchase_value">{% trans "Valeur d'achat (DA)" %}</label>
+            <div class="input-group input-group--suffix">
+              <input type="number" id="id_purchase_value" name="purchase_value" class="form-control"
+                     value="{{ form.purchase_value.value|default:'' }}" step="1000" placeholder="2500000">
+              <span class="input-group__suffix">DA</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_purchase_date">{% trans "Date d'achat" %}</label>
+            <div class="date-picker-wrapper">
+              <input type="date" id="id_purchase_date" name="purchase_date" class="form-control"
+                     value="{{ form.purchase_date.value|default:'' }}">
+              <i class="fa-solid fa-calendar-days date-picker-wrapper__icon" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_initial_km">{% trans "Kilométrage initial" %}</label>
+            <div class="input-group input-group--suffix">
+              <input type="number" id="id_initial_km" name="initial_km" class="form-control"
+                     value="{{ form.initial_km.value|default:'' }}" placeholder="0">
+              <span class="input-group__suffix">km</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# ── Step 3: Documents ── #}
+      <div data-step-panel="3" style="display:none;">
+        <h2 class="section__title">{% trans "Documents administratifs" %}</h2>
+        {% include "components/forms/file_upload.html" with
+            label=_("Carte grise")
+            accept=".pdf,.jpg,.jpeg,.png"
+            help_text=_("PDF ou image — Max 5 Mo")
+        %}
+        {% include "components/forms/file_upload.html" with
+            label=_("Attestation d'assurance")
+            accept=".pdf,.jpg,.jpeg,.png"
+            help_text=_("PDF ou image — Max 5 Mo")
+        %}
+      </div>
+
+      {# ── Step 4: Récapitulatif ── #}
+      <div data-step-panel="4" style="display:none;">
+        <h2 class="section__title">{% trans "Récapitulatif" %}</h2>
+        <div class="card" style="background:var(--color-bg-muted);">
+          <div class="card__body">
+            <p class="text-sm text-muted">{% trans "Vérifiez les informations avant de valider." %}</p>
+            <div id="form-summary" style="margin-top:var(--space-4);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+              {# Populated by JS #}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {# ── Navigation Buttons ── #}
+      <div style="display:flex;justify-content:space-between;margin-top:var(--space-6);padding-top:var(--space-4);border-top:1px solid var(--color-border);">
+        <button type="button"
+                class="btn btn--secondary"
+                data-step-prev
+                style="display:none;">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          {% trans "Précédent" %}
+        </button>
+        <button type="button"
+                class="btn btn--primary ml-auto"
+                data-step-next>
+          {% trans "Suivant" %}
+          <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+        </button>
+        <button type="submit"
+                class="btn btn--primary ml-auto"
+                data-step-submit
+                style="display:none;">
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          {% if vehicle %}{% trans "Enregistrer les modifications" %}{% else %}{% trans "Créer le véhicule" %}{% endif %}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block js_extra %}
+<script>
+var default_steps = [
+  {label:'{% trans "Identification" %}', icon:'fa-id-card'},
+  {label:'{% trans "Modèle" %}',         icon:'fa-car'},
+  {label:'{% trans "Fiscal" %}',         icon:'fa-file-invoice'},
+  {label:'{% trans "Documents" %}',      icon:'fa-folder'},
+  {label:'{% trans "Récapitulatif" %}',  icon:'fa-check-circle'}
+];
+</script>
+{% endblock %}

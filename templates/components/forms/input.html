@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<div class="form-group">
+  {% if label %}
+    <label class="form-label"
+           for="{{ field.id_for_label|default:field.html_name }}">
+      {{ label }}
+      {% if required %}<span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <div class="input-group">
+    {% if icon %}
+      <i class="fa-solid {{ icon }} input-group__icon" aria-hidden="true"></i>
+    {% endif %}
+
+    <input type="{{ type|default:'text' }}"
+           id="{{ field.id_for_label|default:field.html_name }}"
+           name="{{ field.html_name }}"
+           class="form-control{% if icon %} {% endif %}{% if field.errors %} is-invalid{% endif %}"
+           {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+           {% if required %}required aria-required="true"{% endif %}
+           {% if field.value %}value="{{ field.value }}"{% endif %}
+           {% if disabled %}disabled{% endif %}
+           {% if readonly %}readonly{% endif %}
+           {% if field.errors %}aria-describedby="error-{{ field.html_name }}"{% elif help_text %}aria-describedby="help-{{ field.html_name }}"{% endif %}
+           {% if field.field.max_length %}maxlength="{{ field.field.max_length }}"{% endif %}
+           autocomplete="{{ autocomplete|default:'on' }}">
+
+    {% if suffix_icon %}
+      <span class="input-group__suffix">
+        <i class="fa-solid {{ suffix_icon }}" aria-hidden="true"></i>
+      </span>
+    {% endif %}
+  </div>
+
+  {% if field.errors %}
+    <div class="form-error" id="error-{{ field.html_name }}" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      {{ field.errors|first }}
+    </div>
+  {% elif help_text %}
+    <p class="form-help" id="help-{{ field.html_name }}">{{ help_text }}</p>
+  {% endif %}
+</div>

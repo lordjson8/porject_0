@@ -1,0 +1,126 @@
+{% extends "base/base_auth.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Connexion" %}{% endblock %}
+
+{% block auth_title %}{% trans "Connexion" %}{% endblock %}
+{% block auth_subtitle %}{% trans "Saisissez vos identifiants pour accéder à votre espace." %}{% endblock %}
+
+{% block auth_form %}
+  <form method="post" action="{% url 'auth:login' %}" novalidate id="login-form">
+    {% csrf_token %}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+
+    {# ── Non-field errors ── #}
+    {% include "components/forms/form_errors.html" with form=form %}
+
+    {# ── Username ── #}
+    <div class="form-group">
+      <label class="form-label" for="id_username">
+        {% trans "Nom d'utilisateur" %}
+        <span class="required" aria-hidden="true">*</span>
+      </label>
+      <div class="input-group">
+        <i class="fa-solid fa-user input-group__icon" aria-hidden="true"></i>
+        <input type="text"
+               id="id_username"
+               name="username"
+               class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+               placeholder="{% trans 'jean.dupont' %}"
+               value="{{ form.username.value|default:'' }}"
+               required
+               aria-required="true"
+               autocomplete="username"
+               autofocus>
+      </div>
+      {% if form.username.errors %}
+        <div class="form-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          {{ form.username.errors|first }}
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── Password ── #}
+    <div class="form-group">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-1);">
+        <label class="form-label" for="id_password" style="margin-bottom:0">
+          {% trans "Mot de passe" %}
+          <span class="required" aria-hidden="true">*</span>
+        </label>
+        <a href="{% url 'auth:password-reset' %}"
+           class="text-sm text-primary"
+           style="font-weight:var(--font-medium);">
+          {% trans "Mot de passe oublié ?" %}
+        </a>
+      </div>
+      <div class="input-group input-group--suffix">
+        <i class="fa-solid fa-lock input-group__icon" aria-hidden="true"></i>
+        <input type="password"
+               id="id_password"
+               name="password"
+               class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+               placeholder="••••••••"
+               required
+               aria-required="true"
+               autocomplete="current-password">
+        <button type="button"
+                class="input-group__suffix"
+                style="pointer-events:all;cursor:pointer;background:none;border:none;color:var(--color-text-muted);"
+                onclick="togglePasswordVisibility()"
+                aria-label="{% trans 'Afficher/masquer le mot de passe' %}">
+          <i id="pwd-toggle-icon" class="fa-solid fa-eye" aria-hidden="true"></i>
+        </button>
+      </div>
+      {% if form.password.errors %}
+        <div class="form-error" role="alert">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+          {{ form.password.errors|first }}
+        </div>
+      {% endif %}
+    </div>
+
+    {# ── Remember Me ── #}
+    <div class="form-group" style="margin-bottom:var(--space-5);">
+      <label class="form-check">
+        <input type="checkbox"
+               name="remember_me"
+               id="id_remember_me"
+               class="form-check__input">
+        <span class="form-check__label">{% trans "Se souvenir de moi" %}</span>
+      </label>
+    </div>
+
+    {# ── Submit Button ── #}
+    <button type="submit"
+            class="btn btn--primary btn--full btn--lg"
+            id="login-btn"
+            aria-label="{% trans 'Se connecter' %}">
+      <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+      <span>{% trans "Se connecter" %}</span>
+    </button>
+  </form>
+
+  <script>
+  function togglePasswordVisibility() {
+    var input = document.getElementById('id_password');
+    var icon  = document.getElementById('pwd-toggle-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fa-solid fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fa-solid fa-eye';
+    }
+  }
+
+  // Loading state on submit
+  document.getElementById('login-form').addEventListener('submit', function() {
+    var btn = document.getElementById('login-btn');
+    btn.classList.add('is-loading');
+    btn.disabled = true;
+  });
+  </script>
+{% endblock %}

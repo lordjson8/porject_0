@@ -1,0 +1,19 @@
+{% load i18n %}
+
+<div class="empty-state" role="status" aria-label="{{ title }}">
+  <div class="empty-state__icon" aria-hidden="true">
+    <i class="fa-solid {{ icon|default:'fa-inbox' }}"></i>
+  </div>
+  <h3 class="empty-state__title">{{ title }}</h3>
+  {% if subtitle %}
+    <p class="empty-state__subtitle">{{ subtitle }}</p>
+  {% endif %}
+  {% if cta_label %}
+    <a class="btn btn--primary"
+       href="{{ cta_href|default:'#' }}"
+       {% if cta_modal %}data-modal-trigger="{{ cta_modal }}"{% endif %}>
+      {% if cta_icon %}<i class="fa-solid {{ cta_icon }}" aria-hidden="true"></i>{% endif %}
+      {{ cta_label }}
+    </a>
+  {% endif %}
+</div>

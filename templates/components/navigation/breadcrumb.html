@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<nav class="breadcrumb"
+     aria-label="{% trans 'Fil d\'Ariane' %}">
+  <ol style="display:flex;align-items:center;gap:var(--space-2);list-style:none;margin:0;padding:0;flex-wrap:wrap;">
+    {% for item in items %}
+      <li class="breadcrumb__item">
+        {% if not forloop.last and item.1 %}
+          <a class="breadcrumb__link" href="{{ item.1 }}">
+            {% if forloop.first %}
+              <i class="fa-solid fa-house" aria-hidden="true" style="font-size:12px;margin-right:4px"></i>
+            {% endif %}
+            {{ item.0 }}
+          </a>
+        {% else %}
+          <span class="breadcrumb__current" aria-current="page">{{ item.0 }}</span>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li class="breadcrumb__item">
+        <a class="breadcrumb__link" href="{% url 'dashboard:home' %}">
+          <i class="fa-solid fa-house" aria-hidden="true" style="font-size:12px;margin-right:4px"></i>
+          {% trans "Accueil" %}
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

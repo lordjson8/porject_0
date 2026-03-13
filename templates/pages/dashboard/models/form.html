@@ -1,0 +1,96 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{% if model_obj %}{% trans "Modifier le modèle" %}{% else %}{% trans "Nouveau modèle" %}{% endif %}{% endblock %}
+{% block page_title %}{% if model_obj %}{% trans "Modifier le modèle" %}{% else %}{% trans "Nouveau modèle" %}{% endif %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">
+      {% if model_obj %}{% trans "Modifier" %} — {{ model_obj.brand }} {{ model_obj.name }}
+      {% else %}{% trans "Nouveau modèle" %}{% endif %}
+    </h1>
+  </div>
+  <a class="btn btn--secondary" href="{% url 'dashboard:models-list' %}">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    {% trans "Retour" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:700px;">
+  <div class="card__header">
+    <h2 class="card__title">
+      {% if model_obj %}{% trans "Modifier le modèle" %}{% else %}{% trans "Informations du modèle" %}{% endif %}
+    </h2>
+  </div>
+  <div class="card__body">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "components/forms/form_errors.html" with form=form %}
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label" for="id_brand">
+            {% trans "Marque" %} <span class="required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="id_brand" name="brand" class="form-control"
+                 value="{{ form.brand.value|default:'' }}" placeholder="Peugeot" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_name">
+            {% trans "Modèle" %} <span class="required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="id_name" name="name" class="form-control"
+                 value="{{ form.name.value|default:'' }}" placeholder="308" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_category">{% trans "Catégorie" %}</label>
+          <select id="id_category" name="category" class="form-control form-select">
+            <option value="">{% trans "-- Sélectionner --" %}</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if form.category.value == cat.id|stringformat:'s' %}selected{% endif %}>
+                {{ cat.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="id_type">{% trans "Type de carrosserie" %}</label>
+          <select id="id_type" name="body_type" class="form-control form-select">
+            <option value="">{% trans "-- Sélectionner --" %}</option>
+            <option value="berline">{% trans "Berline" %}</option>
+            <option value="suv">{% trans "SUV / 4×4" %}</option>
+            <option value="break">{% trans "Break" %}</option>
+            <option value="monospace">{% trans "Monospace" %}</option>
+            <option value="utilitaire">{% trans "Utilitaire" %}</option>
+            <option value="camion">{% trans "Camion" %}</option>
+          </select>
+        </div>
+
+        <div class="form-group form-grid__full">
+          <label class="form-label" for="id_description">{% trans "Description" %}</label>
+          <textarea id="id_description" name="description" class="form-control form-textarea"
+                    rows="3" placeholder="{% trans 'Remarques ou informations complémentaires...' %}">{{ form.description.value|default:'' }}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:var(--space-3);justify-content:flex-end;margin-top:var(--space-5);">
+        <a class="btn btn--secondary" href="{% url 'dashboard:models-list' %}">
+          {% trans "Annuler" %}
+        </a>
+        <button type="submit" class="btn btn--primary">
+          <i class="fa-solid fa-check" aria-hidden="true"></i>
+          {% if model_obj %}{% trans "Enregistrer" %}{% else %}{% trans "Créer le modèle" %}{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

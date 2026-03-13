@@ -1,0 +1,448 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "FleetManager — Gestion de Flotte" %}{% endblock %}
+
+{% block css_extra %}
+<style>
+  /* Landing-page-specific styles */
+  .landing-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 64px;
+    background: rgba(26,26,46,0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-8);
+    z-index: var(--z-fixed);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .landing-nav__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: white;
+    text-decoration: none;
+    font-family: var(--font-heading);
+    font-weight: var(--font-bold);
+    font-size: var(--text-xl);
+  }
+
+  .landing-nav__brand-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--color-primary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-lg);
+  }
+
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1A1A2E 0%, #16213E 40%, #0F3460 70%, #1A1A2E 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px var(--space-8) var(--space-16);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 10%; left: 5%;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(255,108,55,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 5%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(23,162,184,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(255,108,55,0.15);
+    color: var(--color-primary-light);
+    border: 1px solid rgba(255,108,55,0.3);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+    margin-bottom: var(--space-5);
+    animation: fadeInUp 0.6s ease both;
+  }
+
+  .hero__title {
+    font-family: var(--font-heading);
+    font-size: var(--text-5xl);
+    font-weight: var(--font-bold);
+    color: white;
+    line-height: 1.15;
+    margin-bottom: var(--space-4);
+    animation: fadeInUp 0.6s ease 0.1s both;
+  }
+
+  .hero__title span {
+    color: var(--color-primary);
+  }
+
+  .hero__subtitle {
+    font-size: var(--text-xl);
+    color: rgba(255,255,255,0.65);
+    margin-bottom: var(--space-8);
+    line-height: var(--leading-loose);
+    animation: fadeInUp 0.6s ease 0.2s both;
+  }
+
+  .hero__actions {
+    display: flex;
+    gap: var(--space-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.6s ease 0.3s both;
+  }
+
+  .btn--hero {
+    height: 52px;
+    padding: 0 var(--space-8);
+    font-size: var(--text-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .btn--hero-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    height: 52px;
+    padding: 0 var(--space-8);
+    font-size: var(--text-md);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+  }
+
+  .btn--hero-outline:hover {
+    border-color: white;
+    background: rgba(255,255,255,0.08);
+    color: white;
+  }
+
+  /* Features */
+  .features {
+    background: var(--color-bg-surface);
+    padding: var(--space-16) var(--space-8);
+  }
+
+  .features__header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-12);
+  }
+
+  .features__tag {
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-3);
+  }
+
+  .features__title {
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    color: var(--color-text-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .features__subtitle {
+    font-size: var(--text-md);
+    color: var(--color-text-muted);
+    line-height: var(--leading-loose);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    padding: var(--space-6);
+    background: var(--color-bg-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+  }
+
+  .feature-card:hover {
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+    border-color: var(--color-primary-light);
+  }
+
+  .feature-card__icon {
+    width: 56px;
+    height: 56px;
+    background: var(--color-primary-subtle);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .feature-card__title {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--color-text-dark);
+    margin-bottom: var(--space-2);
+  }
+
+  .feature-card__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: var(--leading-loose);
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    padding: var(--space-10) var(--space-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-12);
+    flex-wrap: wrap;
+  }
+
+  .stat-counter {
+    text-align: center;
+    color: white;
+  }
+
+  .stat-counter__value {
+    font-family: var(--font-heading);
+    font-size: var(--text-4xl);
+    font-weight: var(--font-bold);
+    display: block;
+    margin-bottom: var(--space-1);
+  }
+
+  .stat-counter__label {
+    font-size: var(--text-sm);
+    opacity: 0.85;
+  }
+
+  .stat-counter__divider {
+    width: 1px;
+    height: 60px;
+    background: rgba(255,255,255,0.25);
+  }
+
+  /* Landing Footer */
+  .landing-footer {
+    background: var(--color-bg-dark);
+    padding: var(--space-8);
+    text-align: center;
+    color: rgba(255,255,255,0.5);
+    font-size: var(--text-sm);
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}landing-page{% endblock %}
+
+{% block body_content %}
+
+{# ── Navbar ── #}
+<nav class="landing-nav" role="navigation" aria-label="{% trans 'Navigation' %}">
+  <a class="landing-nav__brand" href="{% url 'landing-index' %}">
+    <div class="landing-nav__brand-icon" aria-hidden="true">
+      <i class="fa-solid fa-car-side"></i>
+    </div>
+    FleetManager
+  </a>
+
+  <a class="btn btn--primary"
+     href="{% url 'auth:login' %}"
+     aria-label="{% trans 'Se connecter à FleetManager' %}">
+    <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+    {% trans "Se connecter" %}
+  </a>
+</nav>
+
+{# ── Hero ── #}
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__content">
+    <div class="hero__eyebrow">
+      <i class="fa-solid fa-star" aria-hidden="true"></i>
+      {% trans "Solution complète de gestion de flotte" %}
+    </div>
+
+    <h1 class="hero__title" id="hero-title">
+      {% trans "Gérez votre" %}
+      <span>{% trans "flotte automobile" %}</span>
+      {% trans "avec intelligence" %}
+    </h1>
+
+    <p class="hero__subtitle">
+      {% trans "FleetManager centralise le suivi de vos véhicules, la gestion des contrats, des services et des documents administratifs — le tout dans une interface intuitive et moderne." %}
+    </p>
+
+    <div class="hero__actions">
+      <a class="btn btn--primary btn--hero"
+         href="{% url 'auth:login' %}"
+         aria-label="{% trans 'Démarrer avec FleetManager' %}">
+        <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+        {% trans "Démarrer maintenant" %}
+      </a>
+      <a class="btn btn--hero-outline"
+         href="#features"
+         aria-label="{% trans 'Voir les fonctionnalités' %}">
+        <i class="fa-solid fa-play-circle" aria-hidden="true"></i>
+        {% trans "Voir les fonctionnalités" %}
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ── Features ── #}
+<section class="features" id="features" aria-labelledby="features-title">
+  <div class="features__header">
+    <p class="features__tag">{% trans "Fonctionnalités" %}</p>
+    <h2 class="features__title" id="features-title">
+      {% trans "Tout ce dont vous avez besoin" %}
+    </h2>
+    <p class="features__subtitle">
+      {% trans "Une plateforme intégrée pour piloter votre flotte automobile de A à Z." %}
+    </p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-car"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Suivi des véhicules" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Gérez votre parc complet : immatriculation, modèles, kilométrage, conducteurs assignés et statuts en temps réel." %}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-file-contract"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Gestion des contrats" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Centralisez vos contrats d'assurance, de leasing et de maintenance. Soyez alerté avant chaque échéance." %}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Alertes documents" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Ne manquez plus aucune expiration : contrôle technique, assurance, vignette — des alertes automatiques vous préviennent à l'avance." %}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-wrench"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Services & maintenance" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Planifiez et suivez toutes les interventions mécaniques, révisions périodiques et réparations de votre flotte." %}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-chart-bar"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Rapports & analyses" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Visualisez les coûts, l'utilisation et les performances de votre flotte avec des tableaux de bord dynamiques." %}
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-card__icon" aria-hidden="true">
+        <i class="fa-solid fa-globe"></i>
+      </div>
+      <h3 class="feature-card__title">{% trans "Multilingue & accessible" %}</h3>
+      <p class="feature-card__desc">
+        {% trans "Interface disponible en Français, Anglais et Arabe (RTL). Conforme aux normes d'accessibilité WCAG AA." %}
+      </p>
+    </div>
+  </div>
+</section>
+
+{# ── Stats Bar ── #}
+<section class="stats-bar" aria-label="{% trans 'Statistiques FleetManager' %}">
+  <div class="stat-counter">
+    <span class="stat-counter__value" data-count-up="1250">1 250</span>
+    <span class="stat-counter__label">{% trans "Véhicules gérés" %}</span>
+  </div>
+  <div class="stat-counter__divider" aria-hidden="true"></div>
+  <div class="stat-counter">
+    <span class="stat-counter__value" data-count-up="340">340</span>
+    <span class="stat-counter__label">{% trans "Conducteurs actifs" %}</span>
+  </div>
+  <div class="stat-counter__divider" aria-hidden="true"></div>
+  <div class="stat-counter">
+    <span class="stat-counter__value" data-count-up="890">890</span>
+    <span class="stat-counter__label">{% trans "Contrats suivis" %}</span>
+  </div>
+  <div class="stat-counter__divider" aria-hidden="true"></div>
+  <div class="stat-counter">
+    <span class="stat-counter__value" data-count-up="99">99</span>
+    <span class="stat-counter__label">{% trans "% de satisfaction" %}</span>
+  </div>
+</section>
+
+{# ── Landing Footer ── #}
+<footer class="landing-footer" role="contentinfo">
+  <p>
+    &copy; {% now "Y" %} FleetManager.
+    {% trans "Tous droits réservés." %}
+    &nbsp;·&nbsp;
+    <a href="#" style="color:rgba(255,255,255,0.6)">{% trans "Politique de confidentialité" %}</a>
+    &nbsp;·&nbsp;
+    <a href="#" style="color:rgba(255,255,255,0.6)">{% trans "Mentions légales" %}</a>
+  </p>
+</footer>
+
+{% endblock %}

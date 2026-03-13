@@ -1,0 +1,174 @@
+{% load i18n %}
+
+<nav class="sidebar" id="sidebar" role="navigation" aria-label="{% trans 'Navigation principale' %}">
+
+  {# ── Logo ── #}
+  <a class="sidebar__logo" href="{% url 'dashboard:home' %}" aria-label="FleetManager {% trans 'Accueil' %}">
+    <div class="sidebar__logo-icon" aria-hidden="true">
+      <i class="fa-solid fa-car-side"></i>
+    </div>
+    <div>
+      <span class="sidebar__logo-text">FleetManager</span>
+      <span class="sidebar__logo-sub">{% trans "Flotte Automobile" %}</span>
+    </div>
+  </a>
+
+  {# ── Navigation ── #}
+  <div class="sidebar__nav" role="list">
+
+    {# ── Group: Principal ── #}
+    <div class="nav-group">
+      <div class="nav-group__label" aria-hidden="true">{% trans "Principal" %}</div>
+
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if request.path == '/dashboard/' %} is-active{% endif %}"
+           href="{% url 'dashboard:home' %}"
+           data-tooltip="{% trans 'Tableau de bord' %}"
+           aria-current="{% if request.path == '/dashboard/' %}page{% endif %}">
+          <i class="fa-solid fa-gauge nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Tableau de bord" %}</span>
+        </a>
+      </div>
+    </div>
+
+    {# ── Group: Parc Véhicules ── #}
+    <div class="nav-group">
+      <div class="nav-group__label" aria-hidden="true">{% trans "Parc Véhicules" %}</div>
+
+      {# Véhicules #}
+      <div class="nav-item{% if '/dashboard/vehicles' in request.path %} is-open{% endif %}" role="listitem">
+        <button class="nav-item__link{% if '/dashboard/vehicles' in request.path %} is-active{% endif %}"
+                data-toggle="sub"
+                data-tooltip="{% trans 'Véhicules' %}"
+                aria-expanded="{% if '/dashboard/vehicles' in request.path %}true{% else %}false{% endif %}">
+          <i class="fa-solid fa-car nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Véhicules" %}</span>
+          <i class="fa-solid fa-chevron-right nav-item__arrow" aria-hidden="true"></i>
+        </button>
+        <div class="nav-sub" role="list">
+          <a class="nav-sub__link{% if request.path == '/dashboard/vehicles/' %} is-active{% endif %}"
+             href="{% url 'dashboard:vehicles-list' %}" role="listitem">
+            <span class="nav-sub__dot" aria-hidden="true"></span>
+            {% trans "Liste des véhicules" %}
+          </a>
+          <a class="nav-sub__link{% if '/dashboard/models' in request.path %} is-active{% endif %}"
+             href="{% url 'dashboard:models-list' %}" role="listitem">
+            <span class="nav-sub__dot" aria-hidden="true"></span>
+            {% trans "Modèles" %}
+          </a>
+        </div>
+      </div>
+
+      {# Conducteurs #}
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/drivers' in request.path %} is-active{% endif %}"
+           href="{% url 'dashboard:drivers-list' %}"
+           data-tooltip="{% trans 'Conducteurs' %}"
+           aria-current="{% if '/dashboard/drivers' in request.path %}page{% endif %}">
+          <i class="fa-solid fa-id-card nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Conducteurs" %}</span>
+        </a>
+      </div>
+    </div>
+
+    {# ── Group: Gestion ── #}
+    <div class="nav-group">
+      <div class="nav-group__label" aria-hidden="true">{% trans "Gestion" %}</div>
+
+      {# Contrats #}
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/contracts' in request.path %} is-active{% endif %}"
+           href="{% url 'dashboard:contracts-list' %}"
+           data-tooltip="{% trans 'Contrats' %}"
+           aria-current="{% if '/dashboard/contracts' in request.path %}page{% endif %}">
+          <i class="fa-solid fa-file-contract nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Contrats" %}</span>
+        </a>
+      </div>
+
+      {# Services #}
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/services' in request.path %} is-active{% endif %}"
+           href="{% url 'dashboard:services-list' %}"
+           data-tooltip="{% trans 'Services' %}"
+           aria-current="{% if '/dashboard/services' in request.path %}page{% endif %}">
+          <i class="fa-solid fa-wrench nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Services" %}</span>
+        </a>
+      </div>
+
+      {# Documents #}
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/documents' in request.path %} is-active{% endif %}"
+           href="{% url 'dashboard:documents-list' %}"
+           data-tooltip="{% trans 'Documents' %}"
+           aria-current="{% if '/dashboard/documents' in request.path %}page{% endif %}">
+          <i class="fa-solid fa-folder-open nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Documents" %}</span>
+        </a>
+      </div>
+    </div>
+
+    {# ── Group: Analytique ── #}
+    <div class="nav-group">
+      <div class="nav-group__label" aria-hidden="true">{% trans "Analytique" %}</div>
+
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/reports' in request.path %} is-active{% endif %}"
+           href="#"
+           data-tooltip="{% trans 'Rapports' %}">
+          <i class="fa-solid fa-chart-bar nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Rapports" %}</span>
+        </a>
+      </div>
+
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/locations' in request.path %} is-active{% endif %}"
+           href="#"
+           data-tooltip="{% trans 'Emplacements' %}">
+          <i class="fa-solid fa-map-marker-alt nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Emplacements" %}</span>
+        </a>
+      </div>
+    </div>
+
+    {# ── Group: Configuration ── #}
+    <div class="nav-group">
+      <div class="nav-group__label" aria-hidden="true">{% trans "Configuration" %}</div>
+
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link{% if '/dashboard/settings' in request.path %} is-active{% endif %}"
+           href="{% url 'dashboard:settings' %}"
+           data-tooltip="{% trans 'Paramètres' %}"
+           aria-current="{% if '/dashboard/settings' in request.path %}page{% endif %}">
+          <i class="fa-solid fa-gear nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Paramètres" %}</span>
+        </a>
+      </div>
+
+      <div class="nav-item" role="listitem">
+        <a class="nav-item__link"
+           href="#"
+           data-tooltip="{% trans 'Carburants / Config' %}">
+          <i class="fa-solid fa-sliders nav-item__icon" aria-hidden="true"></i>
+          <span class="nav-item__text">{% trans "Carburants / Config" %}</span>
+        </a>
+      </div>
+    </div>
+
+    {% block sidebar_extra %}{% endblock %}
+
+  </div>{# /sidebar__nav #}
+
+  {# ── Sidebar Footer: Collapse Toggle ── #}
+  <div class="sidebar__footer">
+    <button class="sidebar__toggle"
+            id="sidebarToggle"
+            aria-label="{% trans 'Réduire la barre latérale' %}"
+            aria-controls="sidebar">
+      <i class="fa-solid fa-angles-left sidebar__toggle-icon" aria-hidden="true"></i>
+      <span class="sidebar__toggle-text">{% trans "Réduire" %}</span>
+    </button>
+  </div>
+
+</nav>

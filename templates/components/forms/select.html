@@ -1,0 +1,37 @@
+{% load i18n %}
+
+<div class="form-group">
+  {% if label %}
+    <label class="form-label"
+           for="{{ field.id_for_label|default:field.html_name }}">
+      {{ label }}
+      {% if required %}<span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <select id="{{ field.id_for_label|default:field.html_name }}"
+          name="{{ field.html_name }}"
+          class="form-control form-select{% if field.errors %} is-invalid{% endif %}"
+          {% if required %}required aria-required="true"{% endif %}
+          {% if disabled %}disabled{% endif %}
+          {% if field.errors %}aria-describedby="error-{{ field.html_name }}"{% elif help_text %}aria-describedby="help-{{ field.html_name }}"{% endif %}>
+    {% if placeholder %}
+      <option value="">{{ placeholder }}</option>
+    {% endif %}
+    {% for value, display in field.field.choices %}
+      <option value="{{ value }}"
+              {% if field.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+        {{ display }}
+      </option>
+    {% endfor %}
+  </select>
+
+  {% if field.errors %}
+    <div class="form-error" id="error-{{ field.html_name }}" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      {{ field.errors|first }}
+    </div>
+  {% elif help_text %}
+    <p class="form-help" id="help-{{ field.html_name }}">{{ help_text }}</p>
+  {% endif %}
+</div>

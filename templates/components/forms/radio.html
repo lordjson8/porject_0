@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<div class="form-group">
+  {% if label %}
+    <span class="form-label">
+      {{ label }}
+      {% if required %}<span class="required" aria-hidden="true">*</span>{% endif %}
+    </span>
+  {% endif %}
+
+  <div class="radio-group{% if orientation == 'horizontal' %} radio-group--horizontal{% endif %}"
+       role="radiogroup"
+       aria-label="{{ label }}">
+    {% for value, display in field.field.choices %}
+      <label class="form-radio">
+        <input type="radio"
+               name="{{ field.html_name }}"
+               value="{{ value }}"
+               class="form-radio__input"
+               {% if field.value|stringformat:"s" == value|stringformat:"s" %}checked{% endif %}
+               {% if required %}required{% endif %}
+               {% if disabled %}disabled{% endif %}>
+        <span class="form-radio__label">{{ display }}</span>
+      </label>
+    {% endfor %}
+  </div>
+
+  {% if field.errors %}
+    <div class="form-error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      {{ field.errors|first }}
+    </div>
+  {% elif help_text %}
+    <p class="form-help">{{ help_text }}</p>
+  {% endif %}
+</div>

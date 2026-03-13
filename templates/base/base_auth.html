@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block body_content %}
+<main class="auth-shell" role="main">
+  <div class="auth-card" role="dialog" aria-label="{% trans 'Authentification' %}">
+
+    {# ── Brand Panel ── #}
+    <div class="auth-brand" role="banner" aria-hidden="true">
+      <div class="auth-brand__icon">
+        <i class="fa-solid fa-car-side" aria-hidden="true"></i>
+      </div>
+      <h1 class="auth-brand__title">FleetManager</h1>
+      <p class="auth-brand__subtitle">{% trans "Gestion de la Flotte Automobile" %}</p>
+
+      <div style="margin-top:var(--space-8);display:flex;flex-direction:column;gap:var(--space-3);width:100%;">
+        {% with features=features|default:None %}
+        <div style="display:flex;align-items:center;gap:var(--space-3);color:rgba(255,255,255,0.85);">
+          <i class="fa-solid fa-circle-check" style="color:rgba(255,255,255,0.7)"></i>
+          <span style="font-size:var(--text-sm)">{% trans "Suivi en temps réel des véhicules" %}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-3);color:rgba(255,255,255,0.85);">
+          <i class="fa-solid fa-circle-check" style="color:rgba(255,255,255,0.7)"></i>
+          <span style="font-size:var(--text-sm)">{% trans "Gestion des contrats et services" %}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-3);color:rgba(255,255,255,0.85);">
+          <i class="fa-solid fa-circle-check" style="color:rgba(255,255,255,0.7)"></i>
+          <span style="font-size:var(--text-sm)">{% trans "Alertes documents et échéances" %}</span>
+        </div>
+        {% endwith %}
+      </div>
+    </div>
+
+    {# ── Form Panel ── #}
+    <div class="auth-form-panel">
+      <div style="margin-bottom:var(--space-6);">
+        <h2 class="auth-form-panel__title">{% block auth_title %}{% trans "Connexion" %}{% endblock %}</h2>
+        <p class="auth-form-panel__subtitle">{% block auth_subtitle %}{% trans "Bienvenue, connectez-vous à votre compte." %}{% endblock %}</p>
+      </div>
+
+      {# ── Django Messages ── #}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert--{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %} mb-4"
+               data-django-message
+               role="alert">
+            <i class="fa-solid
+               {% if message.tags == 'error' %}fa-circle-xmark
+               {% elif message.tags == 'success' %}fa-circle-check
+               {% elif message.tags == 'warning' %}fa-triangle-exclamation
+               {% else %}fa-circle-info{% endif %}
+               alert__icon" aria-hidden="true"></i>
+            <div class="alert__body">
+              <p class="alert__message">{{ message }}</p>
+            </div>
+            <button class="alert__close" aria-label="{% trans 'Fermer' %}">
+              <i class="fa-solid fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% block auth_form %}{% endblock %}
+
+      {% block auth_footer_link %}{% endblock %}
+    </div>
+  </div>
+</main>
+{% endblock %}

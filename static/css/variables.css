@@ -1,0 +1,141 @@
+/* =============================================================================
+   variables.css — All CSS custom properties (design tokens)
+   FleetManager Design System — Postman-inspired theme
+   ============================================================================= */
+
+:root {
+  /* ── Brand Colors ── */
+  --color-primary:        #FF6C37;
+  --color-primary-dark:   #E05520;
+  --color-primary-light:  #FF8D65;
+  --color-primary-subtle: rgba(255, 108, 55, 0.12);
+
+  /* ── Background Scale ── */
+  --color-bg-dark:    #1A1A2E;
+  --color-bg-mid:     #2D2D44;
+  --color-bg-panel:   #222238;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-muted:   #F8F9FA;
+  --color-bg-hover:   #F2F2F2;
+
+  /* ── Text ── */
+  --color-text-dark:  #212121;
+  --color-text-body:  #3D3D3D;
+  --color-text-muted: #6B6B6B;
+  --color-text-light: #9E9E9E;
+  --color-text-white: #FFFFFF;
+
+  /* ── Borders ── */
+  --color-border:       #E8E8E8;
+  --color-border-dark:  #3D3D55;
+  --color-border-focus: #FF6C37;
+
+  /* ── Semantic Colors ── */
+  --color-success:        #28A745;
+  --color-success-bg:     #D4EDDA;
+  --color-success-border: #C3E6CB;
+  --color-danger:         #DC3545;
+  --color-danger-bg:      #F8D7DA;
+  --color-danger-border:  #F5C6CB;
+  --color-warning:        #FFC107;
+  --color-warning-bg:     #FFF3CD;
+  --color-warning-border: #FFEEBA;
+  --color-info:           #17A2B8;
+  --color-info-bg:        #D1ECF1;
+  --color-info-border:    #BEE5EB;
+
+  /* ── Sidebar ── */
+  --sidebar-width:           260px;
+  --sidebar-collapsed-width: 64px;
+  --sidebar-bg:              var(--color-bg-dark);
+  --sidebar-text:            rgba(255,255,255,0.75);
+  --sidebar-text-active:     #FFFFFF;
+  --sidebar-item-active-bg:  rgba(255, 108, 55, 0.15);
+  --sidebar-item-hover-bg:   rgba(255,255,255,0.06);
+  --sidebar-border:          rgba(255,255,255,0.08);
+
+  /* ── Topbar ── */
+  --topbar-height: 60px;
+  --topbar-bg:     #FFFFFF;
+  --topbar-border: var(--color-border);
+
+  /* ── Spacing ── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Border Radius ── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-xs:  0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.10), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-xl:  0 20px 25px rgba(0,0,0,0.10), 0 10px 10px rgba(0,0,0,0.04);
+  --shadow-primary: 0 4px 14px rgba(255,108,55,0.35);
+
+  /* ── Typography ── */
+  --font-body:     'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading:  'Space Grotesk', 'DM Sans', sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 14px;
+  --text-md:   15px;
+  --text-lg:   16px;
+  --text-xl:   18px;
+  --text-2xl:  20px;
+  --text-3xl:  24px;
+  --text-4xl:  30px;
+  --text-5xl:  36px;
+
+  --font-normal:   400;
+  --font-medium:   500;
+  --font-semibold: 600;
+  --font-bold:     700;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-loose:  1.75;
+
+  /* ── Transitions ── */
+  --transition-fast:   0.15s ease;
+  --transition-base:   0.2s ease;
+  --transition-slow:   0.3s ease;
+  --transition-spring: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Z-Index Scale ── */
+  --z-dropdown:  1000;
+  --z-sticky:    1020;
+  --z-fixed:     1030;
+  --z-overlay:   1040;
+  --z-modal:     1050;
+  --z-popover:   1060;
+  --z-tooltip:   1070;
+  --z-toast:     1080;
+
+  /* ── Layout ── */
+  --content-max-width: 1400px;
+  --content-padding:   var(--space-6);
+  --card-padding:      var(--space-5);
+  --input-height:      40px;
+  --button-height:     38px;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  --sidebar-direction: rtl;
+}

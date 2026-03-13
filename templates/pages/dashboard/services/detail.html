@@ -1,0 +1,90 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n %}
+
+{% block title %}{{ service.title }} — {% trans "Service" %}{% endblock %}
+{% block page_title %}{% trans "Détail service" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{{ service.title }}</h1>
+  </div>
+  <a class="btn btn--secondary" href="{% url 'dashboard:services-list' %}">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    {% trans "Retour" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="grid gap-6" style="grid-template-columns:2fr 1fr;">
+
+  <div class="card">
+    <div class="card__header">
+      <h2 class="card__title">{% trans "Détails de l'intervention" %}</h2>
+    </div>
+    <div class="card__body">
+      <dl style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Type d'intervention" %}</dt>
+          <dd class="text-sm">{{ service.type|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Véhicule" %}</dt>
+          <dd class="text-sm font-semibold">{{ service.vehicle_plate|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Date" %}</dt>
+          <dd class="text-sm">{{ service.date|date:"d/m/Y"|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Kilométrage" %}</dt>
+          <dd class="text-sm">{{ service.km|floatformat:0|default:"—" }} km</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Technicien" %}</dt>
+          <dd class="text-sm">{{ service.technician|default:"—" }}</dd>
+        </div>
+        <div>
+          <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">{% trans "Garage / Prestataire" %}</dt>
+          <dd class="text-sm">{{ service.provider|default:"—" }}</dd>
+        </div>
+      </dl>
+
+      {% if service.description %}
+        <div class="mt-4">
+          <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">{% trans "Observations" %}</p>
+          <p class="text-sm">{{ service.description }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+    <div class="card">
+      <div class="card__header"><h3 class="card__title">{% trans "Coût" %}</h3></div>
+      <div class="card__body">
+        <p style="font-family:var(--font-heading);font-size:var(--text-3xl);font-weight:var(--font-bold);color:var(--color-primary);">
+          {{ service.cost|floatformat:2|default:"—" }} DA
+        </p>
+        <p class="text-xs text-muted mt-2">{% trans "Coût total de l'intervention" %}</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__header"><h3 class="card__title">{% trans "Statut" %}</h3></div>
+      <div class="card__body">
+        {% if service.status == "done" %}
+          {% include "components/ui/alert.html" with message=_("Intervention effectuée") level="success" %}
+        {% elif service.status == "pending" %}
+          {% include "components/ui/alert.html" with message=_("Intervention planifiée") level="info" %}
+        {% elif service.status == "overdue" %}
+          {% include "components/ui/alert.html" with message=_("Intervention en retard") level="error" %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

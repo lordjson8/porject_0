@@ -1,0 +1,174 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n static fleet_ui %}
+
+{% block title %}{% trans "Tableau de bord" %}{% endblock %}
+{% block page_title %}{% trans "Tableau de bord" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    <h1 class="page-header__title">{% trans "Tableau de bord" %}</h1>
+    <p class="page-header__subtitle">{% trans "Vue d'ensemble de votre flotte automobile" %}</p>
+  </div>
+  <div class="page-header__actions">
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <a class="btn btn--primary" href="{% url 'dashboard:vehicles-new' %}">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouveau véhicule" %}
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ── KPI Stat Cards ── #}
+<div class="grid grid-cols-4 gap-4 mb-6 stats-grid"
+     aria-label="{% trans 'Indicateurs clés' %}">
+
+  {% stat_card title=_("Total véhicules") value=total_vehicles|default:0 trend=vehicles_trend|default:"+0" trend_type="up" trend_label=_("ce mois") icon="fa-car" color="orange" %}
+  {% stat_card title=_("En service") value=active_vehicles|default:0 trend=active_trend|default:"+0" trend_type="up" trend_label=_("vs mois dernier") icon="fa-car-side" color="green" %}
+  {% stat_card title=_("Contrats actifs") value=active_contracts|default:0 trend=contracts_trend|default:"0" trend_type="neutral" trend_label=_("en cours") icon="fa-file-contract" color="blue" %}
+  {% stat_card title=_("Alertes documents") value=doc_alerts|default:0 trend=alerts_trend|default:"0" trend_type="down" trend_label=_("expirations proches") icon="fa-triangle-exclamation" color="red" %}
+
+</div>
+
+{# ── Charts Row ── #}
+<div class="grid gap-6 mb-6 charts-row"
+     style="grid-template-columns: 1fr 380px;"
+     aria-label="{% trans 'Graphiques' %}">
+
+  {# Bar Chart: Services par mois #}
+  {% include "components/charts/chart_bar.html" with
+      chart_id="services-monthly"
+      title=_("Services par mois")
+      subtitle=_("12 derniers mois")
+      height=280
+      chart_data=services_chart_data|default:'{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[12,8,15,10,18,22,14,9,17,20,13,16]}'
+  %}
+
+  {# Donut Chart: Répartition par catégorie #}
+  {% include "components/charts/chart_donut.html" with
+      chart_id="category-breakdown"
+      title=_("Par catégorie")
+      subtitle=_("Répartition du parc")
+      height=240
+      chart_data=category_chart_data|default:'{"labels":["Berline","SUV","Utilitaire","Camion","Moto"],"values":[45,30,15,7,3]}'
+      show_legend=True
+  %}
+
+</div>
+
+{# ── Bottom Row ── #}
+<div class="grid gap-6" style="grid-template-columns: 1fr 400px;">
+
+  {# Recent Vehicles Table #}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <h2 class="card__title">{% trans "Derniers véhicules enregistrés" %}</h2>
+        <p class="card__subtitle">{% trans "5 véhicules les plus récents" %}</p>
+      </div>
+      <a class="btn btn--secondary btn--sm" href="{% url 'dashboard:vehicles-list' %}">
+        {% trans "Voir tout" %}
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      </a>
+    </div>
+    <div class="card__body" style="padding:0;">
+      {% if recent_vehicles %}
+        <table class="data-table" aria-label="{% trans 'Derniers véhicules' %}">
+          <thead>
+            <tr>
+              <th>{% trans "Immatriculation" %}</th>
+              <th>{% trans "Modèle" %}</th>
+              <th>{% trans "Conducteur" %}</th>
+              <th>{% trans "Statut" %}</th>
+              <th>{% trans "KM" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vehicle in recent_vehicles %}
+              <tr>
+                <td data-label="{% trans 'Immatriculation' %}">
+                  <a class="cell-plate cell-link" href="{{ vehicle.detail_url|default:'#' }}">
+                    {{ vehicle.plate }}
+                  </a>
+                </td>
+                <td data-label="{% trans 'Modèle' %}">{{ vehicle.model_name }}</td>
+                <td data-label="{% trans 'Conducteur' %}">
+                  {{ vehicle.driver_name|default:"—" }}
+                </td>
+                <td data-label="{% trans 'Statut' %}">
+                  {% include "components/fleet/status_badge.html" with status=vehicle.status %}
+                </td>
+                <td data-label="{% trans 'KM' %}">
+                  {{ vehicle.last_km|floatformat:0|default:"—" }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        {% include "components/ui/empty_state.html" with
+            icon="fa-car"
+            title=_("Aucun véhicule")
+            subtitle=_("Commencez par enregistrer votre premier véhicule.")
+            cta_label=_("Ajouter un véhicule")
+            cta_href="/dashboard/vehicles/new/"
+            cta_icon="fa-plus"
+        %}
+      {% endif %}
+    </div>
+  </div>
+
+  {# Upcoming Contract Expirations #}
+  <div class="card">
+    <div class="card__header">
+      <div>
+        <h2 class="card__title">{% trans "Échéances contrats" %}</h2>
+        <p class="card__subtitle">{% trans "Prochaines expirations" %}</p>
+      </div>
+      <a class="btn btn--secondary btn--sm" href="{% url 'dashboard:contracts-list' %}">
+        {% trans "Voir tout" %}
+      </a>
+    </div>
+    <div class="card__body" style="padding:0;">
+      {% if upcoming_contracts %}
+        {% for contract in upcoming_contracts %}
+          {% include "components/fleet/contract_row.html" with contract=contract %}
+        {% endfor %}
+      {% else %}
+        {% include "components/ui/empty_state.html" with
+            icon="fa-file-contract"
+            title=_("Aucune échéance")
+            subtitle=_("Tous vos contrats sont à jour.")
+        %}
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+{# ── Document Alerts ── #}
+{% if expiring_documents %}
+<div class="card mt-6">
+  <div class="card__header">
+    <div>
+      <h2 class="card__title">{% trans "Documents à renouveler" %}</h2>
+      <p class="card__subtitle">{% trans "Documents expirant dans les 60 prochains jours" %}</p>
+    </div>
+    <a class="btn btn--secondary btn--sm" href="{% url 'dashboard:documents-list' %}">
+      {% trans "Gérer les documents" %}
+    </a>
+  </div>
+  <div class="card__body">
+    <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+      {% for doc in expiring_documents %}
+        {% include "components/fleet/document_item.html" with document=doc %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}

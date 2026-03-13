@@ -1,0 +1,7 @@
+{% load i18n %}
+
+<span class="badge badge--{{ variant|default:'neutral' }}"
+      role="status">
+  {% if dot %}<span class="badge__dot" aria-hidden="true"></span>{% endif %}
+  {{ label }}
+</span>

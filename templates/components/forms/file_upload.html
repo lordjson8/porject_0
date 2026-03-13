@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<div class="form-group">
+  {% if label %}
+    <label class="form-label">
+      {{ label }}
+      {% if required %}<span class="required" aria-hidden="true">*</span>{% endif %}
+    </label>
+  {% endif %}
+
+  <div class="file-upload-zone"
+       role="button"
+       tabindex="0"
+       aria-label="{% trans 'Zone de dépôt de fichier' %}"
+       onkeydown="if(event.key==='Enter'||event.key===' ')this.querySelector('input').click()">
+
+    <input type="file"
+           id="{{ field.id_for_label|default:field.html_name }}"
+           name="{{ field.html_name }}"
+           class="file-upload-zone__input"
+           {% if accept %}accept="{{ accept }}"{% endif %}
+           {% if multiple %}multiple{% endif %}
+           {% if required %}required aria-required="true"{% endif %}
+           aria-label="{{ label }}">
+
+    <div class="file-upload-zone__icon" aria-hidden="true">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+    </div>
+    <p class="file-upload-zone__text">
+      {% trans "Glissez-déposez vos fichiers ici, ou" %}
+      <span class="file-upload-zone__link">{% trans "parcourez" %}</span>
+    </p>
+    {% if help_text %}
+      <p class="file-upload-zone__hint">{{ help_text }}</p>
+    {% else %}
+      <p class="file-upload-zone__hint">{% trans "Formats acceptés : PDF, DOC, JPG — Max 10 Mo" %}</p>
+    {% endif %}
+  </div>
+
+  {# Uploaded file list #}
+  <div class="file-list" id="file-list-{{ field.html_name }}"></div>
+
+  {% if field.errors %}
+    <div class="form-error" role="alert">
+      <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+      {{ field.errors|first }}
+    </div>
+  {% endif %}
+</div>

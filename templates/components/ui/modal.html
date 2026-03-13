@@ -1,0 +1,42 @@
+{% load i18n %}
+
+<div class="modal-backdrop"
+     data-modal-id="{{ modal_id }}"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true"
+     aria-labelledby="modal-title-{{ modal_id }}">
+
+  <div class="modal modal--{{ size|default:'md' }}">
+
+    {# ── Header ── #}
+    <div class="modal__header">
+      <h2 class="modal__title" id="modal-title-{{ modal_id }}">{{ title }}</h2>
+      <button class="modal__close"
+              data-modal-close="{{ modal_id }}"
+              aria-label="{% trans 'Fermer' %}">
+        <i class="fa-solid fa-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    {# ── Body ── #}
+    <div class="modal__body">
+      {% if modal_body %}{{ modal_body }}{% else %}{% block modal_body %}{% endblock %}{% endif %}
+    </div>
+
+    {# ── Footer ── #}
+    <div class="modal__footer">
+      <button class="btn btn--secondary"
+              data-modal-close="{{ modal_id }}">
+        {% trans "Annuler" %}
+      </button>
+      {% if confirm_label %}
+        <button class="btn btn--{{ confirm_variant|default:'primary' }}"
+                id="modal-confirm-{{ modal_id }}">
+          {{ confirm_label }}
+        </button>
+      {% endif %}
+    </div>
+
+  </div>
+</div>

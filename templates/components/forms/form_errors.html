@@ -1,0 +1,28 @@
+{% load i18n %}
+
+{% if form.non_field_errors %}
+  <div class="form-errors-block" role="alert" aria-live="assertive">
+    <p class="form-errors-block__title">
+      <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+      {% trans "Le formulaire contient des erreurs :" %}
+    </p>
+    <ul class="form-errors-block__list">
+      {% for error in form.non_field_errors %}
+        <li class="form-errors-block__item">{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% if form.errors and not form.non_field_errors %}
+  <div class="form-errors-block" role="alert" aria-live="assertive">
+    <p class="form-errors-block__title">
+      <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+      {% blocktrans count count=form.errors|length %}
+        {{ count }} champ contient une erreur.
+      {% plural %}
+        {{ count }} champs contiennent des erreurs.
+      {% endblocktrans %}
+    </p>
+  </div>
+{% endif %}

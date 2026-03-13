@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<div class="dropdown">
+  <button class="btn btn--{{ trigger_variant|default:'secondary' }}{% if trigger_size %} btn--{{ trigger_size }}{% endif %}"
+          data-dropdown="{{ menu_id }}"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="{{ menu_id }}">
+    {% if trigger_icon and not trigger_label %}
+      <i class="fa-solid {{ trigger_icon }}" aria-hidden="true"></i>
+    {% else %}
+      {% if trigger_icon %}<i class="fa-solid {{ trigger_icon }}" aria-hidden="true"></i>{% endif %}
+      {% if trigger_label %}<span>{{ trigger_label }}</span>{% endif %}
+      <i class="fa-solid fa-chevron-down" style="font-size:10px;opacity:0.6" aria-hidden="true"></i>
+    {% endif %}
+  </button>
+
+  <div class="dropdown__menu{% if align_right %} dropdown__menu--right{% endif %}"
+       id="{{ menu_id }}"
+       role="menu">
+    {% for item in items %}
+      {% if item.separator %}
+        <div class="dropdown__separator" role="separator"></div>
+      {% else %}
+        <a class="dropdown__item{% if item.danger %} dropdown__item--danger{% endif %}"
+           href="{{ item.href|default:'#' }}"
+           role="menuitem"
+           {% if item.method %}data-method="{{ item.method }}"{% endif %}>
+          {% if item.icon %}<i class="fa-solid {{ item.icon }}" aria-hidden="true"></i>{% endif %}
+          {{ item.label }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

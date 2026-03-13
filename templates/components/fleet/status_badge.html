@@ -1,0 +1,38 @@
+{% load i18n %}
+
+{% if status == "commander" %}
+  <span class="status-badge status-badge--commander" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "À commander" %}
+  </span>
+{% elif status == "demande" %}
+  <span class="status-badge status-badge--demande" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "Nouvelle demande" %}
+  </span>
+{% elif status == "inscrit" %}
+  <span class="status-badge status-badge--inscrit" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "Inscrit" %}
+  </span>
+{% elif status == "declasse" %}
+  <span class="status-badge status-badge--declasse" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "Déclassé" %}
+  </span>
+{% elif status == "maintenance" %}
+  <span class="status-badge status-badge--maintenance" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "En maintenance" %}
+  </span>
+{% elif status == "service" %}
+  <span class="status-badge status-badge--service" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {% trans "En service" %}
+  </span>
+{% else %}
+  <span class="status-badge status-badge--commander" role="status">
+    <span class="status-badge__dot" aria-hidden="true"></span>
+    {{ status|capfirst }}
+  </span>
+{% endif %}

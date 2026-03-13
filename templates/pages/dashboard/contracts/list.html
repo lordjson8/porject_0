@@ -1,0 +1,128 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% trans "Contrats" %}{% endblock %}
+{% block page_title %}{% trans "Contrats" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Contrats" %}</h1>
+    <p class="page-header__subtitle">{% trans "Gestion des contrats d'assurance, leasing et maintenance." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <a class="btn btn--primary" href="#">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Nouveau contrat" %}
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# Filter Bar #}
+<div class="filter-bar">
+  <div class="filter-bar__search" style="flex:1;">
+    {% include "components/forms/search_bar.html" with placeholder=_("Rechercher un contrat...") target_table="contracts-table" %}
+  </div>
+  <select class="form-control form-select" style="width:180px;" aria-label="{% trans 'Statut' %}">
+    <option value="">{% trans "Tous les statuts" %}</option>
+    <option>{% trans "Actif" %}</option>
+    <option>{% trans "Expiré" %}</option>
+    <option>{% trans "En attente" %}</option>
+  </select>
+  <select class="form-control form-select" style="width:180px;" aria-label="{% trans 'Type' %}">
+    <option value="">{% trans "Tous les types" %}</option>
+    <option>{% trans "Assurance" %}</option>
+    <option>{% trans "Leasing" %}</option>
+    <option>{% trans "Maintenance" %}</option>
+  </select>
+</div>
+
+<div class="table-wrapper" data-table="contracts-table">
+  <div class="table-toolbar">
+    <div class="table-toolbar__left">
+      <h2 class="table-toolbar__title">{% trans "Liste des contrats" %}</h2>
+    </div>
+    <div class="table-toolbar__right">
+      <div class="rows-per-page">
+        <label>{% trans "Afficher" %}</label>
+        <select data-rows-per-page>
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+        </select>
+        <span>{% trans "lignes" %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="data-table" aria-label="{% trans 'Contrats' %}">
+      <thead>
+        <tr>
+          <th class="sortable">{% trans "Numéro" %}</th>
+          <th class="sortable">{% trans "Intitulé" %}</th>
+          <th class="sortable">{% trans "Prestataire" %}</th>
+          <th class="sortable">{% trans "Type" %}</th>
+          <th class="sortable">{% trans "Début" %}</th>
+          <th class="sortable">{% trans "Fin" %}</th>
+          <th class="sortable">{% trans "Montant" %}</th>
+          <th class="sortable">{% trans "Statut" %}</th>
+          <th style="width:100px;">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contract in contracts %}
+          <tr>
+            <td data-label="{% trans 'Numéro' %}">
+              <a class="cell-plate cell-link" href="{{ contract.detail_url|default:'#' }}">
+                {{ contract.number }}
+              </a>
+            </td>
+            <td data-label="{% trans 'Intitulé' %}">{{ contract.title }}</td>
+            <td data-label="{% trans 'Prestataire' %}">{{ contract.provider|default:"—" }}</td>
+            <td data-label="{% trans 'Type' %}">
+              <span class="badge badge--neutral">{{ contract.type|default:"—" }}</span>
+            </td>
+            <td data-label="{% trans 'Début' %}">{{ contract.start_date|date:"d/m/Y"|default:"—" }}</td>
+            <td data-label="{% trans 'Fin' %}">{{ contract.end_date|date:"d/m/Y"|default:"—" }}</td>
+            <td data-label="{% trans 'Montant' %}">{{ contract.amount|floatformat:2|default:"—" }} DA</td>
+            <td data-label="{% trans 'Statut' %}">
+              {% if contract.status == "active" %}
+                <span class="badge badge--success">{% trans "Actif" %}</span>
+              {% elif contract.status == "expired" %}
+                <span class="badge badge--danger">{% trans "Expiré" %}</span>
+              {% else %}
+                <span class="badge badge--warning">{% trans "En attente" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% include "components/tables/table_actions.html" with
+                  view_url=contract.detail_url
+                  delete_url=contract.delete_url
+              %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9" style="padding:0;border:none;">
+              {% include "components/ui/empty_state.html" with
+                  icon="fa-file-contract"
+                  title=_("Aucun contrat")
+                  subtitle=_("Commencez par créer votre premier contrat.")
+                  cta_label=_("Nouveau contrat")
+                  cta_icon="fa-plus"
+              %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "components/tables/pagination.html" with page_obj=contracts %}
+</div>
+
+{% endblock %}

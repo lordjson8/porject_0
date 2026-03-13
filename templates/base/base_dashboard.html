@@ -1,0 +1,67 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
+{% block css_extra %}
+  {# Chart.js CDN — loaded only on dashboard pages #}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js" defer></script>
+  {% block dashboard_css_extra %}{% endblock %}
+{% endblock %}
+
+{% block body_content %}
+<div class="app-shell">
+
+  {# ── Sidebar Overlay (mobile) ── #}
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  {# ── Sidebar ── #}
+  {% include "layouts/sidebar.html" %}
+
+  {# ── Main Wrapper ── #}
+  <div class="main-wrapper">
+
+    {# ── Topbar ── #}
+    {% include "layouts/topbar.html" %}
+
+    {# ── Django Messages ── #}
+    {% if messages %}
+      <div style="padding: var(--space-4) var(--space-6) 0;" role="alert" aria-live="polite">
+        {% for message in messages %}
+          <div class="alert alert--{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %} mb-3"
+               data-django-message>
+            <i class="fa-solid
+               {% if message.tags == 'error' %}fa-circle-xmark
+               {% elif message.tags == 'success' %}fa-circle-check
+               {% elif message.tags == 'warning' %}fa-triangle-exclamation
+               {% else %}fa-circle-info{% endif %}
+               alert__icon" aria-hidden="true"></i>
+            <div class="alert__body">
+              <p class="alert__message">{{ message }}</p>
+            </div>
+            <button class="alert__close" aria-label="{% trans 'Fermer' %}">
+              <i class="fa-solid fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {# ── Main Content ── #}
+    <main class="main-content page-content" role="main" id="main-content">
+
+      {# Page Header #}
+      {% block page_header %}{% endblock %}
+
+      {# Main Content Block #}
+      {% block content %}{% endblock %}
+
+    </main>
+
+    {# ── Footer ── #}
+    {% include "layouts/footer.html" %}
+
+  </div>{# /main-wrapper #}
+
+</div>{# /app-shell #}
+{% endblock %}

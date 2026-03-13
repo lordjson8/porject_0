@@ -1,0 +1,101 @@
+{% load i18n %}
+
+{% if view_mode == "list" %}
+{# ── List View ── #}
+<div class="card" style="display:flex;align-items:center;gap:var(--space-4);padding:var(--space-3) var(--space-4);">
+  <div style="width:48px;height:48px;background:var(--color-bg-muted);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--color-text-light);font-size:20px;flex-shrink:0;">
+    {% if vehicle.image_url %}
+      <img src="{{ vehicle.image_url }}" alt="{{ vehicle.plate }}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-md);">
+    {% else %}
+      <i class="fa-solid fa-car" aria-hidden="true"></i>
+    {% endif %}
+  </div>
+
+  <div style="flex:1;min-width:0;">
+    <p class="vehicle-card__plate">{{ vehicle.plate }}</p>
+    <p class="vehicle-card__model">{{ vehicle.model_name }}</p>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:var(--space-4);">
+    {% if vehicle.driver_name %}
+      <span style="font-size:var(--text-sm);color:var(--color-text-muted);">
+        <i class="fa-solid fa-user" aria-hidden="true"></i>
+        {{ vehicle.driver_name }}
+      </span>
+    {% endif %}
+
+    {% include "components/fleet/status_badge.html" with status=vehicle.status %}
+
+    {% if vehicle.last_km %}
+      <span class="vehicle-card__km" style="font-size:var(--text-sm);">
+        <i class="fa-solid fa-road" aria-hidden="true"></i>
+        {{ vehicle.last_km|floatformat:0 }} km
+      </span>
+    {% endif %}
+
+    <a class="btn btn--secondary btn--sm"
+       href="{{ vehicle.detail_url|default:'#' }}"
+       aria-label="{% trans 'Voir' %} {{ vehicle.plate }}">
+      <i class="fa-solid fa-eye" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>
+
+{% else %}
+{# ── Grid View (default) ── #}
+<div class="vehicle-card">
+  {# Image #}
+  <a href="{{ vehicle.detail_url|default:'#' }}"
+     class="vehicle-card__image"
+     aria-label="{{ vehicle.plate }}">
+    {% if vehicle.image_url %}
+      <img src="{{ vehicle.image_url }}" alt="{{ vehicle.plate }}" loading="lazy">
+    {% else %}
+      <i class="fa-solid fa-car" aria-hidden="true"></i>
+    {% endif %}
+
+    {# Status overlay #}
+    <div style="position:absolute;top:var(--space-2);right:var(--space-2);">
+      {% include "components/fleet/status_badge.html" with status=vehicle.status %}
+    </div>
+  </a>
+
+  {# Body #}
+  <div class="vehicle-card__body">
+    <p class="vehicle-card__plate">{{ vehicle.plate }}</p>
+    <p class="vehicle-card__model">{{ vehicle.model_name }}</p>
+
+    <div class="vehicle-card__meta">
+      <span>
+        {% if vehicle.driver_name %}
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
+          {{ vehicle.driver_name }}
+        {% else %}
+          <span class="text-muted">{% trans "Sans conducteur" %}</span>
+        {% endif %}
+      </span>
+      {% if vehicle.last_km %}
+        <span class="vehicle-card__km">
+          <i class="fa-solid fa-road" aria-hidden="true"></i>
+          {{ vehicle.last_km|floatformat:0 }} km
+        </span>
+      {% endif %}
+    </div>
+
+    <div style="margin-top:var(--space-3);display:flex;gap:var(--space-2);">
+      <a class="btn btn--secondary btn--sm"
+         href="{{ vehicle.detail_url|default:'#' }}"
+         style="flex:1;justify-content:center;"
+         aria-label="{% trans 'Voir' %} {{ vehicle.plate }}">
+        <i class="fa-solid fa-eye" aria-hidden="true"></i>
+        {% trans "Détail" %}
+      </a>
+      <a class="btn btn--ghost btn--sm btn--icon"
+         href="{{ vehicle.edit_url|default:'#' }}"
+         aria-label="{% trans 'Modifier' %} {{ vehicle.plate }}">
+        <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+      </a>
+    </div>
+  </div>
+</div>
+{% endif %}

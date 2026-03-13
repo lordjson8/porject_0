@@ -1,0 +1,146 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{% trans "Documents" %}{% endblock %}
+{% block page_title %}{% trans "Documents" %}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{% trans "Documents administratifs" %}</h1>
+    <p class="page-header__subtitle">{% trans "Suivi des documents et de leurs dates d'expiration." %}</p>
+  </div>
+  <div class="page-header__actions">
+    <button class="btn btn--primary" data-modal-trigger="add-document-modal">
+      <i class="fa-solid fa-plus" aria-hidden="true"></i>
+      {% trans "Ajouter un document" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# Alert Stats #}
+<div class="grid grid-cols-4 gap-4 mb-6 stats-grid">
+  {% include "components/charts/stat_card.html" with title=_("Total documents") value=total_docs|default:0 icon="fa-folder-open" color="orange" %}
+  {% include "components/charts/stat_card.html" with title=_("Valides") value=valid_docs|default:0 icon="fa-circle-check" color="green" %}
+  {% include "components/charts/stat_card.html" with title=_("Expirent bientôt") value=expiring_soon|default:0 icon="fa-clock" color="blue" trend_type="neutral" %}
+  {% include "components/charts/stat_card.html" with title=_("Expirés") value=expired_docs|default:0 icon="fa-circle-xmark" color="red" %}
+</div>
+
+{# Expiring Soon Alert #}
+{% if expiring_soon and expiring_soon > 0 %}
+  {% include "components/ui/alert.html" with
+      level="warning"
+      title=_("Documents à renouveler")
+      message=_("Certains documents expirent dans moins de 30 jours. Renouvelez-les rapidement.")
+      dismissible=True
+  %}
+{% endif %}
+
+{# Filter Bar #}
+<div class="filter-bar">
+  <div class="filter-bar__search" style="flex:1;">
+    {% include "components/forms/search_bar.html" with placeholder=_("Rechercher un document...") target_table="documents-table" %}
+  </div>
+  <select class="form-control form-select" style="width:180px;" aria-label="{% trans 'Filtrer par statut' %}">
+    <option value="">{% trans "Tous" %}</option>
+    <option value="valid">{% trans "Valide" %}</option>
+    <option value="expiring">{% trans "Expire bientôt" %}</option>
+    <option value="expired">{% trans "Expiré" %}</option>
+  </select>
+  <select class="form-control form-select" style="width:180px;" aria-label="{% trans 'Filtrer par type' %}">
+    <option value="">{% trans "Tous les types" %}</option>
+    <option value="insurance">{% trans "Assurance" %}</option>
+    <option value="registration">{% trans "Carte grise" %}</option>
+    <option value="control">{% trans "Contrôle technique" %}</option>
+    <option value="permit">{% trans "Permis" %}</option>
+  </select>
+</div>
+
+{# Document List as Cards #}
+<div class="table-wrapper">
+  <div class="table-toolbar">
+    <h2 class="table-toolbar__title">{% trans "Liste des documents" %}</h2>
+    <div class="table-toolbar__right">
+      <div class="rows-per-page">
+        <label>{% trans "Afficher" %}</label>
+        <select data-rows-per-page>
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+        </select>
+        <span>{% trans "lignes" %}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="data-table" data-table="documents-table" aria-label="{% trans 'Documents' %}">
+      <thead>
+        <tr>
+          <th class="sortable">{% trans "Véhicule" %}</th>
+          <th class="sortable">{% trans "Document" %}</th>
+          <th class="sortable">{% trans "Type" %}</th>
+          <th class="sortable">{% trans "Date d'émission" %}</th>
+          <th class="sortable">{% trans "Date d'expiration" %}</th>
+          <th class="sortable">{% trans "Jours restants" %}</th>
+          <th style="width:100px;">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in documents %}
+          <tr>
+            <td data-label="{% trans 'Véhicule' %}">
+              <a class="cell-link" href="#">{{ doc.vehicle_plate|default:"—" }}</a>
+            </td>
+            <td data-label="{% trans 'Document' %}">{{ doc.name }}</td>
+            <td data-label="{% trans 'Type' %}">
+              <span class="badge badge--neutral">{{ doc.type|default:"—" }}</span>
+            </td>
+            <td data-label="{% trans 'Émission' %}">{{ doc.issue_date|date:"d/m/Y"|default:"—" }}</td>
+            <td data-label="{% trans 'Expiration' %}">{{ doc.expiry_date|date:"d/m/Y"|default:"—" }}</td>
+            <td data-label="{% trans 'Jours restants' %}">
+              {% if doc.days_remaining is not None %}
+                {% if doc.days_remaining < 0 %}
+                  <span class="badge badge--danger">{% trans "Expiré" %}</span>
+                {% elif doc.days_remaining < 30 %}
+                  <span class="badge badge--danger">{{ doc.days_remaining }}j</span>
+                {% elif doc.days_remaining < 60 %}
+                  <span class="badge badge--warning">{{ doc.days_remaining }}j</span>
+                {% else %}
+                  <span class="badge badge--success">{{ doc.days_remaining }}j</span>
+                {% endif %}
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% include "components/tables/table_actions.html" with
+                  delete_url=doc.delete_url
+              %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="padding:0;border:none;">
+              {% include "components/ui/empty_state.html" with
+                  icon="fa-folder-open"
+                  title=_("Aucun document")
+                  subtitle=_("Ajoutez les documents administratifs de votre flotte.")
+                  cta_label=_("Ajouter un document")
+                  cta_modal="add-document-modal"
+                  cta_icon="fa-plus"
+              %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include "components/tables/pagination.html" with page_obj=documents %}
+</div>
+
+{% include "components/ui/modal.html" with modal_id="add-document-modal" title=_("Ajouter un document") size="md" confirm_label=_("Enregistrer") %}
+
+{% endblock %}

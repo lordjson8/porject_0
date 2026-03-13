@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div class="nav-item{% if item.children %} {% if item.href in request.path %}is-open{% endif %}{% endif %}"
+     role="listitem">
+
+  {% if item.children %}
+    <button class="nav-item__link{% if item.href in request.path %} is-active{% endif %}"
+            data-toggle="sub"
+            data-tooltip="{{ item.label }}"
+            aria-expanded="{% if item.href in request.path %}true{% else %}false{% endif %}">
+      {% if item.icon %}
+        <i class="fa-solid {{ item.icon }} nav-item__icon" aria-hidden="true"></i>
+      {% endif %}
+      <span class="nav-item__text">{{ item.label }}</span>
+      <i class="fa-solid fa-chevron-right nav-item__arrow" aria-hidden="true"></i>
+    </button>
+
+    <div class="nav-sub" role="list">
+      {% for child in item.children %}
+        <a class="nav-sub__link{% if child.href == request.path %} is-active{% endif %}"
+           href="{{ child.href }}"
+           role="listitem">
+          <span class="nav-sub__dot" aria-hidden="true"></span>
+          {{ child.label }}
+        </a>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <a class="nav-item__link{% if item.href == request.path %} is-active{% endif %}"
+       href="{{ item.href }}"
+       data-tooltip="{{ item.label }}"
+       {% if item.href == request.path %}aria-current="page"{% endif %}>
+      {% if item.icon %}
+        <i class="fa-solid {{ item.icon }} nav-item__icon" aria-hidden="true"></i>
+      {% endif %}
+      <span class="nav-item__text">{{ item.label }}</span>
+    </a>
+  {% endif %}
+
+</div>

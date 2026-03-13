@@ -1,0 +1,56 @@
+{% load i18n %}
+
+<div class="table-actions">
+  {% if view_url %}
+    <a class="action-btn"
+       href="{{ view_url }}"
+       title="{% trans 'Voir le détail' %}"
+       aria-label="{% trans 'Voir' %}">
+      <i class="fa-solid fa-eye" aria-hidden="true"></i>
+    </a>
+  {% endif %}
+
+  {% if edit_url %}
+    <a class="action-btn"
+       href="{{ edit_url }}"
+       title="{% trans 'Modifier' %}"
+       aria-label="{% trans 'Modifier' %}">
+      <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+    </a>
+  {% endif %}
+
+  {% for action in extra_actions %}
+    <a class="action-btn"
+       href="{{ action.href }}"
+       title="{{ action.label }}"
+       aria-label="{{ action.label }}">
+      <i class="fa-solid {{ action.icon }}" aria-hidden="true"></i>
+    </a>
+  {% endfor %}
+
+  {% if delete_url %}
+    <button class="action-btn action-btn--danger"
+            title="{% trans 'Supprimer' %}"
+            aria-label="{% trans 'Supprimer' %}"
+            onclick="confirmAction({
+              title: '{{ delete_confirm_title|default:_('Confirmer la suppression') }}',
+              message: '{{ delete_confirm_msg|default:_('Cette action est irréversible.') }}',
+              label: '{% trans 'Supprimer' %}',
+              danger: true,
+              onConfirm: function() {
+                var form = document.createElement('form');
+                form.method = 'post';
+                form.action = '{{ delete_url }}';
+                var csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = 'csrfmiddlewaretoken';
+                csrf.value = document.cookie.match(/csrftoken=([^;]+)/)[1];
+                form.appendChild(csrf);
+                document.body.appendChild(form);
+                form.submit();
+              }
+            })">
+      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+    </button>
+  {% endif %}
+</div>

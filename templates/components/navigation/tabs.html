@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<div class="tabs"
+     role="tablist"
+     data-tabs="{{ tabs_id|default:'main-tabs' }}"
+     aria-label="{{ tabs_label|default:'Navigation par onglets' }}">
+  {% for tab in tab_items %}
+    <button class="tab__btn{% if forloop.first and not default_tab %} is-active{% elif tab.id == default_tab %} is-active{% endif %}"
+            role="tab"
+            data-tab-target="{{ tab.id }}"
+            aria-selected="{% if forloop.first and not default_tab %}true{% elif tab.id == default_tab %}true{% else %}false{% endif %}"
+            aria-controls="panel-{{ tab.id }}"
+            tabindex="{% if forloop.first and not default_tab %}0{% elif tab.id == default_tab %}0{% else %}-1{% endif %}">
+      {% if tab.icon %}
+        <i class="fa-solid {{ tab.icon }}" aria-hidden="true"></i>
+      {% endif %}
+      {{ tab.label }}
+      {% if tab.badge_count %}
+        <span class="badge badge--neutral" aria-label="{{ tab.badge_count }} {% trans 'éléments' %}">{{ tab.badge_count }}</span>
+      {% endif %}
+    </button>
+  {% endfor %}
+</div>

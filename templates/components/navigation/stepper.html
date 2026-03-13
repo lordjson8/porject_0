@@ -1,0 +1,25 @@
+{% load i18n %}
+
+<div class="stepper"
+     data-stepper="{{ stepper_id|default:'main-stepper' }}"
+     role="list"
+     aria-label="{% trans 'Étapes du formulaire' %}">
+  {% for step in steps %}
+    <div class="step
+                {% if forloop.counter == current_step %}is-active{% endif %}
+                {% if forloop.counter < current_step %}is-completed{% endif %}"
+         role="listitem"
+         aria-current="{% if forloop.counter == current_step %}step{% endif %}">
+      <div class="step__circle" aria-hidden="true">
+        {% if forloop.counter < current_step %}
+          <i class="fa-solid fa-check"></i>
+        {% elif step.icon %}
+          <i class="fa-solid {{ step.icon }}"></i>
+        {% else %}
+          {{ forloop.counter }}
+        {% endif %}
+      </div>
+      <span class="step__label">{{ step.label }}</span>
+    </div>
+  {% endfor %}
+</div>

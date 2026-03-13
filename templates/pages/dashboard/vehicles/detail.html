@@ -1,0 +1,301 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{{ vehicle.plate }} — {% trans "Détail véhicule" %}{% endblock %}
+{% block page_title %}{{ vehicle.plate }}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{{ vehicle.plate }}</h1>
+    <p class="page-header__subtitle">{{ vehicle.model_name }}</p>
+  </div>
+  <div class="page-header__actions">
+    <a class="btn btn--secondary" href="{{ vehicle.edit_url|default:'#' }}">
+      <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+      {% trans "Modifier" %}
+    </a>
+    <button class="btn btn--danger btn--secondary"
+            onclick="confirmAction({
+              title:'{% trans 'Supprimer ce véhicule' %}',
+              message:'{% trans 'Cette action est irréversible.' %}',
+              label:'{% trans 'Supprimer' %}',
+              danger:true,
+              onConfirm:function(){window.location='{{ vehicle.delete_url|default:'#' }}';}
+            })">
+      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+      {% trans "Supprimer" %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# ── Vehicle Header Card ── #}
+<div class="card mb-6">
+  <div class="card__body">
+    <div style="display:flex;gap:var(--space-6);align-items:flex-start;flex-wrap:wrap;">
+
+      {# Vehicle Image #}
+      <div style="width:200px;height:130px;background:var(--color-bg-muted);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;color:var(--color-text-light);font-size:56px;flex-shrink:0;overflow:hidden;">
+        {% if vehicle.image_url %}
+          <img src="{{ vehicle.image_url }}" alt="{{ vehicle.plate }}" style="width:100%;height:100%;object-fit:cover;">
+        {% else %}
+          <i class="fa-solid fa-car-side" aria-hidden="true"></i>
+        {% endif %}
+      </div>
+
+      {# Main Info #}
+      <div style="flex:1;min-width:200px;">
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3);">
+          <h2 style="font-family:var(--font-heading);font-size:var(--text-2xl);font-weight:var(--font-bold);">
+            {{ vehicle.plate }}
+          </h2>
+          {% include "components/fleet/status_badge.html" with status=vehicle.status %}
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-3);">
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Modèle" %}</p>
+            <p class="text-sm font-medium">{{ vehicle.model_name }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Catégorie" %}</p>
+            <p class="text-sm font-medium">{{ vehicle.category|default:"—" }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Conducteur" %}</p>
+            <p class="text-sm font-medium">{{ vehicle.driver_name|default:"—" }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Kilométrage" %}</p>
+            <p class="text-sm font-medium">{{ vehicle.last_km|floatformat:0|default:"—" }} km</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Mise en service" %}</p>
+            <p class="text-sm font-medium">{{ vehicle.start_date|date:"d/m/Y"|default:"—" }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "N° Châssis" %}</p>
+            <p class="text-sm font-medium font-mono">{{ vehicle.chassis_number|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+
+      {# Quick Actions #}
+      <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+        <button class="btn btn--secondary btn--sm">
+          <i class="fa-solid fa-road" aria-hidden="true"></i>
+          {% trans "Saisir KM" %}
+        </button>
+        <button class="btn btn--secondary btn--sm">
+          <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+          {% trans "Planifier service" %}
+        </button>
+        <button class="btn btn--secondary btn--sm">
+          <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+          {% trans "Fiche véhicule" %}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Tabs ── #}
+<div data-tabs="vehicle-tabs" aria-label="{% trans 'Sections du véhicule' %}">
+
+  {% include "components/navigation/tabs.html" with
+      tab_items=vehicle_tabs|default:default_tabs
+      tabs_id="vehicle-tabs"
+  %}
+
+  <div style="padding-top:var(--space-4);">
+
+    {# ── Tab: Informations générales ── #}
+    <div class="tab-panel" data-tab-panel="informations" id="panel-informations">
+      <div class="grid gap-5" style="grid-template-columns:1fr 1fr;">
+        {# Identification #}
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">{% trans "Identification" %}</h3>
+          </div>
+          <div class="card__body">
+            <dl style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Immatriculation" %}</dt>
+                <dd class="text-sm font-semibold font-mono mt-1">{{ vehicle.plate }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "N° Châssis" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.chassis_number|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Couleur" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.color|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Année" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.year|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Carburant" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.fuel_type|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Transmission" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.transmission|default:"—" }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        {# Fiscal Info #}
+        <div class="card">
+          <div class="card__header">
+            <h3 class="card__title">{% trans "Informations fiscales" %}</h3>
+          </div>
+          <div class="card__body">
+            <dl style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Puissance fiscale" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.fiscal_power|default:"—" }} CV</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Valeur d'achat" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.purchase_value|floatformat:2|default:"—" }} DA</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Date d'achat" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.purchase_date|date:"d/m/Y"|default:"—" }}</dd>
+              </div>
+              <div>
+                <dt class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;">{% trans "Amortissement" %}</dt>
+                <dd class="text-sm mt-1">{{ vehicle.depreciation|default:"—" }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Tab: Documents ── #}
+    <div class="tab-panel" data-tab-panel="documents" id="panel-documents">
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">{% trans "Documents du véhicule" %}</h3>
+          <a class="btn btn--primary btn--sm" href="#">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            {% trans "Ajouter un document" %}
+          </a>
+        </div>
+        <div class="card__body">
+          {% if vehicle_documents %}
+            <div style="display:flex;flex-direction:column;gap:var(--space-2);">
+              {% for doc in vehicle_documents %}
+                {% include "components/fleet/document_item.html" with document=doc %}
+              {% endfor %}
+            </div>
+          {% else %}
+            {% include "components/ui/empty_state.html" with
+                icon="fa-folder-open"
+                title=_("Aucun document")
+                subtitle=_("Ajoutez les documents administratifs de ce véhicule.")
+                cta_label=_("Ajouter un document")
+                cta_icon="fa-plus"
+            %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Tab: Services ── #}
+    <div class="tab-panel" data-tab-panel="services" id="panel-services">
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">{% trans "Historique des services" %}</h3>
+          <a class="btn btn--primary btn--sm" href="#">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            {% trans "Ajouter un service" %}
+          </a>
+        </div>
+        <div class="card__body">
+          {% if vehicle_services %}
+            {% for service in vehicle_services %}
+              {% include "components/fleet/service_item.html" with service=service %}
+            {% endfor %}
+          {% else %}
+            {% include "components/ui/empty_state.html" with
+                icon="fa-wrench"
+                title=_("Aucun service enregistré")
+                subtitle=_("Les interventions sur ce véhicule apparaîtront ici.")
+                cta_label=_("Ajouter un service")
+                cta_icon="fa-plus"
+            %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Tab: Contrats ── #}
+    <div class="tab-panel" data-tab-panel="contrats" id="panel-contrats">
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">{% trans "Contrats associés" %}</h3>
+        </div>
+        <div class="card__body" style="padding:0;">
+          {% if vehicle_contracts %}
+            {% for contract in vehicle_contracts %}
+              {% include "components/fleet/contract_row.html" with contract=contract %}
+            {% endfor %}
+          {% else %}
+            {% include "components/ui/empty_state.html" with
+                icon="fa-file-contract"
+                title=_("Aucun contrat associé")
+                subtitle=_("Ce véhicule n'est lié à aucun contrat.")
+            %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Tab: Historique KM ── #}
+    <div class="tab-panel" data-tab-panel="historique-km" id="panel-historique-km">
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">{% trans "Évolution du kilométrage" %}</h3>
+          <button class="btn btn--primary btn--sm">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            {% trans "Saisir relevé KM" %}
+          </button>
+        </div>
+        <div class="card__body">
+          {% include "components/charts/chart_line.html" with
+              chart_id="km-evolution"
+              title=_("Kilométrage")
+              subtitle=_("Relevés des 12 derniers mois")
+              height=260
+              chart_data=km_chart_data|default:'{"labels":["Jan","Fév","Mar","Avr","Mai","Jun"],"values":[45000,46500,48200,49800,51000,52400]}'
+          %}
+        </div>
+      </div>
+    </div>
+
+  </div>{# /tab panels wrapper #}
+</div>{# /data-tabs #}
+
+{% endblock %}
+
+{% block js_extra %}
+<script>
+// Default tabs for this page
+var defaultTabItems = [
+  {id:'informations', label:'{% trans "Informations" %}', icon:'fa-info-circle'},
+  {id:'documents',    label:'{% trans "Documents" %}',    icon:'fa-folder'},
+  {id:'services',     label:'{% trans "Services" %}',     icon:'fa-wrench'},
+  {id:'contrats',     label:'{% trans "Contrats" %}',     icon:'fa-file-contract'},
+  {id:'historique-km',label:'{% trans "Historique KM" %}',icon:'fa-road'}
+];
+</script>
+{% endblock %}

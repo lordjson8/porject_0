@@ -1,0 +1,49 @@
+{% load i18n %}
+
+<div class="contract-row">
+  {# Contract number #}
+  <div class="contract-row__number" aria-label="{% trans 'Numéro' %}">
+    <a href="{{ contract.detail_url|default:'#' }}"
+       style="color:var(--color-primary);text-decoration:none;">
+      {{ contract.number }}
+    </a>
+  </div>
+
+  {# Details #}
+  <div class="contract-row__details">
+    <p class="contract-row__title">{{ contract.title }}</p>
+    <p class="contract-row__meta">
+      {% if contract.provider %}{{ contract.provider }} · {% endif %}
+      {% if contract.start_date %}{{ contract.start_date|date:"d/m/Y" }}{% endif %}
+      {% if contract.end_date %} → {{ contract.end_date|date:"d/m/Y" }}{% endif %}
+    </p>
+  </div>
+
+  {# Amount #}
+  {% if contract.amount %}
+    <div style="font-size:var(--text-sm);font-weight:var(--font-semibold);color:var(--color-text-dark);white-space:nowrap;">
+      {{ contract.amount|floatformat:2 }} DA
+    </div>
+  {% endif %}
+
+  {# Status #}
+  {% if contract.status == "active" %}
+    <span class="badge badge--success">{% trans "Actif" %}</span>
+  {% elif contract.status == "expired" %}
+    <span class="badge badge--danger">{% trans "Expiré" %}</span>
+  {% elif contract.status == "pending" %}
+    <span class="badge badge--warning">{% trans "En attente" %}</span>
+  {% else %}
+    <span class="badge badge--neutral">{{ contract.status|capfirst }}</span>
+  {% endif %}
+
+  {# Actions #}
+  <div class="table-actions">
+    <a class="action-btn"
+       href="{{ contract.detail_url|default:'#' }}"
+       title="{% trans 'Voir' %}"
+       aria-label="{% trans 'Voir le contrat' %} {{ contract.number }}">
+      <i class="fa-solid fa-eye" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,80 @@
+{% load i18n %}
+
+<div class="chart-container" role="figure" aria-label="{{ title }}">
+  <div class="chart-container__header">
+    <div>
+      <h3 class="chart-container__title">{{ title }}</h3>
+      {% if subtitle %}
+        <p class="chart-container__subtitle">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    {% if chart_actions %}
+      <div>{{ chart_actions }}</div>
+    {% endif %}
+  </div>
+
+  <div class="chart-canvas-wrapper">
+    <canvas id="{{ chart_id }}"
+            height="{{ height|default:280 }}"
+            aria-label="{{ title }}"
+            role="img">
+      <p>{% trans "Votre navigateur ne supporte pas les graphiques." %}</p>
+    </canvas>
+  </div>
+
+  {% if chart_data %}
+    <script>
+    (function() {
+      document.addEventListener('DOMContentLoaded', function() {
+        var ctx = document.getElementById('{{ chart_id }}');
+        if (!ctx || typeof Chart === 'undefined') return;
+        var data = {{ chart_data }};
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: [{
+              label: data.dataset_label || '{{ title }}',
+              data: data.values,
+              borderColor: '#FF6C37',
+              backgroundColor: 'rgba(255, 108, 55, 0.08)',
+              borderWidth: 2.5,
+              pointBackgroundColor: '#FF6C37',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              fill: true,
+              tension: 0.35
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#1A1A2E',
+                padding: 10,
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#6B6B6B', font: { size: 12 } }
+              },
+              y: {
+                grid: { color: '#F0F0F0' },
+                ticks: { color: '#6B6B6B', font: { size: 12 } },
+                beginAtZero: true
+              }
+            },
+            interaction: { intersect: false, mode: 'index' }
+          }
+        });
+      });
+    }());
+    </script>
+  {% endif %}
+</div>

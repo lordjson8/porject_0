@@ -1,0 +1,35 @@
+{% load i18n %}
+
+{% with colors_map="orange:var(--color-primary)|green:var(--color-success)|blue:var(--color-info)|red:var(--color-danger)|purple:#7C3AED" %}
+<div class="stat-card"
+     style="
+       --stat-accent-color:{% if color == 'orange' %}var(--color-primary){% elif color == 'green' %}var(--color-success){% elif color == 'blue' %}var(--color-info){% elif color == 'red' %}var(--color-danger){% elif color == 'purple' %}#7C3AED{% else %}var(--color-primary){% endif %};
+       --stat-icon-bg:{% if color == 'orange' %}var(--color-primary-subtle){% elif color == 'green' %}var(--color-success-bg){% elif color == 'blue' %}var(--color-info-bg){% elif color == 'red' %}var(--color-danger-bg){% elif color == 'purple' %}rgba(124,58,237,0.12){% else %}var(--color-primary-subtle){% endif %};
+       --stat-icon-color:{% if color == 'orange' %}var(--color-primary){% elif color == 'green' %}var(--color-success){% elif color == 'blue' %}var(--color-info){% elif color == 'red' %}var(--color-danger){% elif color == 'purple' %}#7C3AED{% else %}var(--color-primary){% endif %};
+     ">
+  <div class="stat-card__header">
+    <span class="stat-card__label">{{ title }}</span>
+    <div class="stat-card__icon" aria-hidden="true">
+      <i class="fa-solid {{ icon|default:'fa-chart-line' }}"></i>
+    </div>
+  </div>
+
+  <div class="stat-card__value"
+       data-count-up="{{ value|default:0 }}"
+       aria-label="{{ title }}: {{ value }}">
+    {{ value|default:0 }}
+  </div>
+
+  {% if trend %}
+    <div class="stat-card__trend stat-card__trend--{{ trend_type|default:'neutral' }}"
+         aria-label="{% trans 'Tendance:' %} {{ trend }}">
+      <i class="fa-solid {% if trend_type == 'up' %}fa-arrow-trend-up{% elif trend_type == 'down' %}fa-arrow-trend-down{% else %}fa-minus{% endif %}"
+         aria-hidden="true"></i>
+      <span>{{ trend }}</span>
+      {% if trend_label %}
+        <span class="stat-card__trend-label">{{ trend_label }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endwith %}

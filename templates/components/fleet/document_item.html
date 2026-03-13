@@ -1,0 +1,74 @@
+{% load i18n %}
+
+<div class="document-item">
+  {# Type Icon #}
+  <div class="document-item__icon"
+       style="background:{% if document.type == 'insurance' %}var(--color-info-bg){% elif document.type == 'registration' %}var(--color-success-bg){% elif document.type == 'control' %}var(--color-warning-bg){% else %}var(--color-bg-muted){% endif %};color:{% if document.type == 'insurance' %}var(--color-info){% elif document.type == 'registration' %}var(--color-success){% elif document.type == 'control' %}var(--color-warning){% else %}var(--color-text-muted){% endif %};"
+       aria-hidden="true">
+    {% if document.type == "insurance" %}
+      <i class="fa-solid fa-shield-halved"></i>
+    {% elif document.type == "registration" %}
+      <i class="fa-solid fa-id-card"></i>
+    {% elif document.type == "control" %}
+      <i class="fa-solid fa-clipboard-check"></i>
+    {% elif document.type == "permit" %}
+      <i class="fa-solid fa-file-lines"></i>
+    {% else %}
+      <i class="fa-solid fa-file-pdf"></i>
+    {% endif %}
+  </div>
+
+  {# Info #}
+  <div class="document-item__info">
+    <p class="document-item__name" title="{{ document.name }}">{{ document.name }}</p>
+    <p class="document-item__meta">
+      {% if document.expiry_date %}
+        {% trans "Expiration :" %} {{ document.expiry_date|date:"d/m/Y" }}
+      {% endif %}
+    </p>
+  </div>
+
+  {# Expiry Countdown #}
+  {% if document.days_remaining is not None %}
+    {% if document.days_remaining < 0 %}
+      <span class="document-item__expiry expiry--expired"
+            role="status"
+            aria-label="{% trans 'Document expiré' %}">
+        <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
+        {% trans "Expiré" %}
+      </span>
+    {% elif document.days_remaining < 30 %}
+      <span class="document-item__expiry expiry--urgent"
+            role="status"
+            aria-label="{{ document.days_remaining }} {% trans 'jours restants' %}">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        {{ document.days_remaining }}j
+      </span>
+    {% elif document.days_remaining < 60 %}
+      <span class="document-item__expiry expiry--soon"
+            role="status"
+            aria-label="{{ document.days_remaining }} {% trans 'jours restants' %}">
+        <i class="fa-solid fa-clock" aria-hidden="true"></i>
+        {{ document.days_remaining }}j
+      </span>
+    {% else %}
+      <span class="document-item__expiry expiry--ok"
+            role="status"
+            aria-label="{{ document.days_remaining }} {% trans 'jours restants' %}">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+        {{ document.days_remaining }}j
+      </span>
+    {% endif %}
+  {% endif %}
+
+  {# Download Action #}
+  {% if document.download_url %}
+    <a class="btn btn--ghost btn--sm btn--icon"
+       href="{{ document.download_url }}"
+       download
+       title="{% trans 'Télécharger' %}"
+       aria-label="{% trans 'Télécharger' %} {{ document.name }}">
+      <i class="fa-solid fa-download" aria-hidden="true"></i>
+    </a>
+  {% endif %}
+</div>

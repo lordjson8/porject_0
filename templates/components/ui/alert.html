@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div class="alert alert--{{ level|default:'info' }}"
+     role="alert"
+     aria-live="polite"
+     {% if auto_dismiss %}data-auto-dismiss="5000"{% endif %}>
+
+  {# Icon #}
+  <i class="fa-solid
+     {% if level == 'success' %}fa-circle-check
+     {% elif level == 'error' %}fa-circle-xmark
+     {% elif level == 'warning' %}fa-triangle-exclamation
+     {% else %}fa-circle-info
+     {% endif %}
+     alert__icon" aria-hidden="true"></i>
+
+  {# Body #}
+  <div class="alert__body">
+    {% if title %}
+      <p class="alert__title">{{ title }}</p>
+    {% endif %}
+    <p class="alert__message">{{ message }}</p>
+  </div>
+
+  {# Dismiss button #}
+  {% if dismissible %}
+    <button class="alert__close" aria-label="{% trans 'Fermer cette alerte' %}">
+      <i class="fa-solid fa-times" aria-hidden="true"></i>
+    </button>
+  {% endif %}
+</div>

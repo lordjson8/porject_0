@@ -1,0 +1,151 @@
+{% extends "base/base_dashboard.html" %}
+{% load i18n fleet_ui %}
+
+{% block title %}{{ contract.number }} — {% trans "Contrat" %}{% endblock %}
+{% block page_title %}{{ contract.number }}{% endblock %}
+
+{% block page_header %}
+<div class="page-header">
+  <div>
+    {% include "components/navigation/breadcrumb.html" with items=breadcrumb_items %}
+    <h1 class="page-header__title" style="margin-top:var(--space-2);">{{ contract.title }}</h1>
+    <p class="page-header__subtitle">
+      {% trans "Contrat" %} {{ contract.number }}
+      {% if contract.status == "active" %}
+        &nbsp;<span class="badge badge--success">{% trans "Actif" %}</span>
+      {% elif contract.status == "expired" %}
+        &nbsp;<span class="badge badge--danger">{% trans "Expiré" %}</span>
+      {% endif %}
+    </p>
+  </div>
+  <a class="btn btn--secondary" href="{% url 'dashboard:contracts-list' %}">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    {% trans "Retour" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{# Contract Summary Card #}
+<div class="card mb-6">
+  <div class="card__body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:var(--space-4);">
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Prestataire" %}</p>
+        <p class="text-sm font-medium">{{ contract.provider|default:"—" }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Type" %}</p>
+        <p class="text-sm font-medium">{{ contract.type|default:"—" }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Date de début" %}</p>
+        <p class="text-sm font-medium">{{ contract.start_date|date:"d/m/Y"|default:"—" }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Date de fin" %}</p>
+        <p class="text-sm font-medium">{{ contract.end_date|date:"d/m/Y"|default:"—" }}</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Montant total" %}</p>
+        <p class="text-sm font-semibold" style="color:var(--color-primary);">{{ contract.amount|floatformat:2|default:"—" }} DA</p>
+      </div>
+      <div>
+        <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">{% trans "Véhicules couverts" %}</p>
+        <p class="text-sm font-medium">{{ contract.vehicle_count|default:0 }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Tabs #}
+<div data-tabs="contract-tabs" aria-label="{% trans 'Onglets contrat' %}">
+  <div class="tabs" role="tablist">
+    <button class="tab__btn is-active" role="tab" data-tab-target="general" aria-selected="true">
+      <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
+      {% trans "Général" %}
+    </button>
+    <button class="tab__btn" role="tab" data-tab-target="services" aria-selected="false">
+      <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+      {% trans "Services inclus" %}
+    </button>
+    <button class="tab__btn" role="tab" data-tab-target="couts" aria-selected="false">
+      <i class="fa-solid fa-coins" aria-hidden="true"></i>
+      {% trans "Coûts récurrents" %}
+    </button>
+    <button class="tab__btn" role="tab" data-tab-target="vehicules" aria-selected="false">
+      <i class="fa-solid fa-car" aria-hidden="true"></i>
+      {% trans "Véhicules liés" %}
+    </button>
+  </div>
+
+  <div style="padding-top:var(--space-4);">
+
+    <div class="tab-panel" data-tab-panel="general">
+      <div class="card">
+        <div class="card__header"><h3 class="card__title">{% trans "Informations générales" %}</h3></div>
+        <div class="card__body">
+          <div class="form-grid">
+            <div>
+              <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;margin-bottom:4px;">{% trans "Description" %}</p>
+              <p class="text-sm">{{ contract.description|default:"—" }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-muted font-semibold" style="text-transform:uppercase;margin-bottom:4px;">{% trans "Conditions de renouvellement" %}</p>
+              <p class="text-sm">{{ contract.renewal_conditions|default:"—" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-tab-panel="services">
+      <div class="card">
+        <div class="card__header">
+          <h3 class="card__title">{% trans "Services inclus dans le contrat" %}</h3>
+          <button class="btn btn--primary btn--sm">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            {% trans "Ajouter" %}
+          </button>
+        </div>
+        <div class="card__body">
+          {% if contract_services %}
+            {% for service in contract_services %}
+              {% include "components/fleet/service_item.html" with service=service %}
+            {% endfor %}
+          {% else %}
+            {% include "components/ui/empty_state.html" with icon="fa-wrench" title=_("Aucun service") subtitle=_("Aucun service n'est inclus dans ce contrat.") %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-tab-panel="couts">
+      <div class="card">
+        <div class="card__header"><h3 class="card__title">{% trans "Coûts récurrents" %}</h3></div>
+        <div class="card__body">
+          {% include "components/ui/empty_state.html" with icon="fa-coins" title=_("Aucun coût récurrent") subtitle=_("Les coûts périodiques apparaîtront ici.") %}
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" data-tab-panel="vehicules">
+      <div class="card">
+        <div class="card__header"><h3 class="card__title">{% trans "Véhicules couverts" %}</h3></div>
+        <div class="card__body" style="padding:0;">
+          {% if linked_vehicles %}
+            {% for vehicle in linked_vehicles %}
+              {% include "components/fleet/vehicle_card.html" with vehicle=vehicle view_mode="list" %}
+            {% endfor %}
+          {% else %}
+            {% include "components/ui/empty_state.html" with icon="fa-car" title=_("Aucun véhicule lié") subtitle=_("Ce contrat ne couvre aucun véhicule pour l'instant.") %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

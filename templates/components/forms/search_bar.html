@@ -1,0 +1,40 @@
+{% load i18n %}
+
+<div class="search-bar">
+  <i class="fa-solid fa-magnifying-glass search-bar__icon" aria-hidden="true"></i>
+  <input type="search"
+         name="{{ name|default:'q' }}"
+         class="form-control"
+         placeholder="{{ placeholder|default:_('Rechercher...') }}"
+         value="{{ value|default:'' }}"
+         autocomplete="off"
+         aria-label="{{ placeholder|default:_('Rechercher') }}"
+         {% if target_table %}data-table-search="{{ target_table }}"{% endif %}
+         oninput="toggleClear(this)">
+  <button type="button"
+          class="search-bar__clear{% if value %} is-visible{% endif %}"
+          aria-label="{% trans 'Effacer la recherche' %}"
+          onclick="clearSearch(this)">
+    <i class="fa-solid fa-times" aria-hidden="true"></i>
+  </button>
+</div>
+
+<script>
+(function() {
+  function toggleClear(input) {
+    var btn = input.parentElement.querySelector('.search-bar__clear');
+    if (btn) btn.classList.toggle('is-visible', input.value.length > 0);
+  }
+  function clearSearch(btn) {
+    var input = btn.parentElement.querySelector('input');
+    if (input) {
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      input.focus();
+    }
+    btn.classList.remove('is-visible');
+  }
+  window.toggleClear  = toggleClear;
+  window.clearSearch  = clearSearch;
+}());
+</script>

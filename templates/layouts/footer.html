@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<footer class="footer" role="contentinfo">
+  <p class="footer__text">
+    &copy; {% now "Y" %} FleetManager.
+    {% trans "Tous droits réservés." %}
+    <span class="text-muted" style="margin-left:var(--space-2);">v1.0.0</span>
+  </p>
+
+  <nav class="footer__links" aria-label="{% trans 'Liens utiles' %}">
+    <a class="footer__link" href="#">{% trans "Documentation" %}</a>
+    <a class="footer__link" href="#">{% trans "Support" %}</a>
+    <a class="footer__link" href="#">{% trans "Politique de confidentialité" %}</a>
+  </nav>
+</footer>
