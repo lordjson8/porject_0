@@ -23,7 +23,7 @@
 {% block content %}
 
 {# KPI Row #}
-<div class="grid grid-cols-4 gap-4 mb-6 stats-grid">
+<div class="stats-grid gap-4 mb-6">
   {% include "components/charts/stat_card.html" with title=_("Total services") value=total_services|default:0 icon="fa-wrench" color="orange" %}
   {% include "components/charts/stat_card.html" with title=_("Planifiés") value=planned_services|default:0 icon="fa-calendar-check" color="blue" %}
   {% include "components/charts/stat_card.html" with title=_("En retard") value=overdue_services|default:0 icon="fa-triangle-exclamation" color="red" %}

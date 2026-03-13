@@ -4,6 +4,84 @@
    ============================================================================= */
 
 /* ══════════════════════════════════════════════
+   DASHBOARD LAYOUT UTILITIES  (desktop defaults)
+   ══════════════════════════════════════════════ */
+
+/* Stats grid: 4 columns default */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* 2-equal columns: charts, info cards */
+.dash-cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+/* Main content + fixed right widget (charts row) */
+.dash-cols-main-aside {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6);
+}
+
+/* Main content + right widget (bottom row) */
+.dash-cols-main-widget {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: var(--space-6);
+}
+
+/* 2/3 + 1/3 for reports */
+.dash-cols-wide-narrow {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space-6);
+}
+
+/* Settings / locations sidebar + main */
+.dash-sidebar-layout {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+.dash-sidebar-layout__sidebar {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.dash-sidebar-layout__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Profile: avatar card + form */
+.dash-panel-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-6);
+  align-items: flex-start;
+}
+
+/* Vehicle detail: 2 info cards side by side */
+.dash-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+/* Period selector bar */
+.dash-period-bar {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: 0 0 var(--space-4);
+}
+
+/* ══════════════════════════════════════════════
    TABLET (≤ 1024px)
    ══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
@@ -59,7 +137,30 @@
   }
 
   /* Chart row stacks */
-  .charts-row {
+  .charts-row,
+  .dash-cols-main-aside,
+  .dash-cols-main-widget,
+  .dash-cols-wide-narrow {
+    grid-template-columns: 1fr;
+  }
+
+  /* 2-col grids collapse to 1 on tablet */
+  .dash-cols-2,
+  .dash-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sidebar layouts stack */
+  .dash-sidebar-layout {
+    flex-direction: column;
+  }
+
+  .dash-sidebar-layout__sidebar {
+    width: 100%;
+  }
+
+  /* Panel layout stacks */
+  .dash-panel-layout {
     grid-template-columns: 1fr;
   }
 
@@ -112,6 +213,32 @@
   /* Stat cards: 1 column */
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* All dash layouts: full width on mobile */
+  .dash-cols-2,
+  .dash-cols-main-aside,
+  .dash-cols-main-widget,
+  .dash-cols-wide-narrow,
+  .dash-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-sidebar-layout__sidebar {
+    width: 100%;
+  }
+
+  .dash-panel-layout {
+    grid-template-columns: 1fr;
+  }
+
+  /* Period bar wraps */
+  .dash-period-bar {
+    padding: 0 0 var(--space-3);
+  }
+  .dash-period-bar .btn {
+    flex: 1;
+    justify-content: center;
   }
 
   /* Vehicle cards: 1 column */
@@ -254,6 +381,68 @@
   .footer {
     flex-direction: column;
     text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   TABS: horizontal scroll on small screens
+   ══════════════════════════════════════════════ */
+.tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+@media (max-width: 640px) {
+  /* Vehicle header image: full width on mobile */
+  .vehicle-header-image {
+    width: 100% !important;
+    height: 180px !important;
+  }
+
+  /* Settings sidebar: horizontal scroll nav on mobile */
+  .dash-sidebar-layout {
+    gap: var(--space-4);
+  }
+
+  .dash-sidebar-layout__sidebar .card__body {
+    display: flex;
+    overflow-x: auto;
+    padding: var(--space-2) var(--space-2) !important;
+    gap: var(--space-1);
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .dash-sidebar-layout__sidebar .card__body::-webkit-scrollbar { display: none; }
+
+  .dash-sidebar-layout__sidebar .nav-item__link {
+    white-space: nowrap;
+    border-left: none !important;
+    border-bottom: 3px solid transparent;
+    border-radius: var(--radius-sm) !important;
+    height: 40px;
+    padding: 0 var(--space-3);
+  }
+
+  .dash-sidebar-layout__sidebar .nav-item__link.is-active {
+    border-bottom-color: var(--color-primary);
+  }
+
+  .dash-sidebar-layout__sidebar .user-menu__separator {
+    display: none;
+  }
+
+  /* Profile avatar: centered on mobile */
+  .dash-panel-layout > div:first-child {
+    order: -1;
+  }
+
+  /* Reports period bar: wrap buttons */
+  .dash-period-bar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 }
 

@@ -26,7 +26,7 @@
 
 {% block page_header_suffix %}
 {# Period selector #}
-<div style="display:flex;gap:var(--space-2);padding:0 var(--space-6) var(--space-4);">
+<div class="dash-period-bar" style="padding-left:var(--space-6);padding-right:var(--space-6);">
   <button class="btn btn--primary btn--sm" data-period="month">{% trans "Ce mois" %}</button>
   <button class="btn btn--secondary btn--sm" data-period="quarter">{% trans "Trimestre" %}</button>
   <button class="btn btn--secondary btn--sm" data-period="year">{% trans "Année" %}</button>
@@ -42,7 +42,7 @@
 {% block content %}
 
 {# ── KPI Row ── #}
-<div class="grid grid-cols-4 gap-4 mb-6">
+<div class="stats-grid gap-4 mb-6">
   {% load fleet_ui %}
   {% stat_card title=_("Coût total flotte") value="248 500" trend="+12%" trend_type="down" trend_label=_("vs mois dernier") icon="fa-euro-sign" color="red" %}
   {% stat_card title=_("Services réalisés") value="34" trend="+8" trend_type="up" trend_label=_("ce mois") icon="fa-wrench" color="orange" %}
@@ -51,12 +51,12 @@
 </div>
 
 {# ── Charts Row ── #}
-<div class="grid gap-6 mb-6" style="grid-template-columns:1fr 1fr;">
+<div class="dash-cols-2 mb-6">
   {% include "components/charts/chart_bar.html" with chart_id="costs-monthly" title=_("Coûts mensuels (DZD)") subtitle=_("12 derniers mois") height=260 chart_data='{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[18500,22000,19800,24500,21000,28000,25500,23000,27000,31000,26000,29500]}' %}
   {% include "components/charts/chart_line.html" with chart_id="km-monthly" title=_("Kilométrage mensuel") subtitle=_("Total flotte") height=260 chart_data='{"labels":["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"],"values":[3200,3800,3500,4100,3900,4600,4200,3700,4400,5100,4300,4800]}' %}
 </div>
 
-<div class="grid gap-6 mb-6" style="grid-template-columns:2fr 1fr;">
+<div class="dash-cols-wide-narrow mb-6">
   {# Services Table #}
   <div class="card">
     <div class="card__header">

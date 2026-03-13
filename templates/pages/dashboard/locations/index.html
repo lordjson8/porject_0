@@ -24,7 +24,7 @@
 
 {# ── Stats ── #}
 {% load fleet_ui %}
-<div class="grid grid-cols-4 gap-4 mb-6">
+<div class="stats-grid gap-4 mb-6">
   {% stat_card title=_("Sites actifs") value=total_locations|default:0 trend="+0" trend_type="neutral" trend_label=_("emplacements") icon="fa-map-marker-alt" color="blue" %}
   {% stat_card title=_("Véhicules assignés") value=vehicles_assigned|default:0 trend="+0" trend_type="neutral" trend_label=_("véhicules") icon="fa-car" color="orange" %}
   {% stat_card title=_("Capacité totale") value=total_capacity|default:0 trend="+0" trend_type="neutral" trend_label=_("places") icon="fa-warehouse" color="green" %}

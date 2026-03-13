@@ -23,7 +23,7 @@
 {% block content %}
 
 {# Alert Stats #}
-<div class="grid grid-cols-4 gap-4 mb-6 stats-grid">
+<div class="stats-grid gap-4 mb-6">
   {% include "components/charts/stat_card.html" with title=_("Total documents") value=total_docs|default:0 icon="fa-folder-open" color="orange" %}
   {% include "components/charts/stat_card.html" with title=_("Valides") value=valid_docs|default:0 icon="fa-circle-check" color="green" %}
   {% include "components/charts/stat_card.html" with title=_("Expirent bientôt") value=expiring_soon|default:0 icon="fa-clock" color="blue" trend_type="neutral" %}

@@ -15,10 +15,10 @@
 {% endblock %}
 
 {% block content %}
-<div style="display:flex;gap:var(--space-6);align-items:flex-start;">
+<div class="dash-sidebar-layout">
 
   {# ── Settings Sidebar Nav ── #}
-  <div style="width:240px;flex-shrink:0;">
+  <div class="dash-sidebar-layout__sidebar">
     <div class="card">
       <div class="card__header">
         <h2 class="card__title">{% trans "Catégories" %}</h2>
@@ -85,7 +85,7 @@
   </div>
 
   {# ── Settings Content Area ── #}
-  <div style="flex:1;min-width:0;">
+  <div class="dash-sidebar-layout__content">
 
     {# CRUD List + Inline Form Pattern #}
     <div class="card">

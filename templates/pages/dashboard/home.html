@@ -23,7 +23,7 @@
 {% block content %}
 
 {# ── KPI Stat Cards ── #}
-<div class="grid grid-cols-4 gap-4 mb-6 stats-grid"
+<div class="stats-grid gap-4 mb-6"
      aria-label="{% trans 'Indicateurs clés' %}">
 
   {% stat_card title=_("Total véhicules") value=total_vehicles|default:0 trend=vehicles_trend|default:"+0" trend_type="up" trend_label=_("ce mois") icon="fa-car" color="orange" %}
@@ -34,8 +34,7 @@
 </div>
 
 {# ── Charts Row ── #}
-<div class="grid gap-6 mb-6 charts-row"
-     style="grid-template-columns: 1fr 380px;"
+<div class="dash-cols-main-aside mb-6"
      aria-label="{% trans 'Graphiques' %}">
 
   {# Bar Chart: Services par mois #}
@@ -47,7 +46,7 @@
 </div>
 
 {# ── Bottom Row ── #}
-<div class="grid gap-6" style="grid-template-columns: 1fr 400px;">
+<div class="dash-cols-main-widget">
 
   {# Recent Vehicles Table #}
   <div class="card">
